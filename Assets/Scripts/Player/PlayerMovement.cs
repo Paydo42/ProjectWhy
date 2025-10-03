@@ -3,17 +3,17 @@ using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
-    [SerializeField] private float moveSpeed = 5f;
+    public float moveSpeed = 5f;
     private Rigidbody2D rb;
     private Vector2 movementInput;
     private Animator animator;
     public Vector2 lastMoveDir = Vector2.right;
     public Transform firePoint;
-
+    
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        animator = GetComponent<Animator>();
+        animator = GetComponent<Animator>();    
         
         // Ensure firePoint is set
      
@@ -35,7 +35,24 @@ public class PlayerMovement : MonoBehaviour
             animator.SetFloat("LastInputY", lastMoveDir.y);
         }
     }
-
+    public void OnInteract(InputAction.CallbackContext context)
+    {
+    Debug.Log("Interact action triggered");
+    if (context.performed)
+        {
+            Debug.Log("Interact action performed");
+            // Check if an upgrade is in range
+            if (Upgrade.upgradeInRange != null)
+            {
+                Debug.Log("Upgrade selected: " + Upgrade.upgradeInRange.name);
+                Upgrade.upgradeInRange.SelectThisUpgrade();
+            }
+            else
+            {
+                Debug.Log("No upgrade in range!");
+            }
+        }
+}
     void FixedUpdate()
     {
         rb.linearVelocity = movementInput * moveSpeed;

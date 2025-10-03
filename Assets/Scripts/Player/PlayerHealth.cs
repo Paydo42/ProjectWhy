@@ -68,7 +68,15 @@ public class PlayerHealth : MonoBehaviour
             Die();
         }
     }
-
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+    if (collision.collider.CompareTag("Enemy"))
+        {
+        // Burada hasar miktarını belirle, örn: 1
+        TakeDamage(1f);
+        Debug.Log("Player took damage from Enemy collision!");
+        }
+    }
     // Handles all damage sources with cooldown
     public void ApplyDamage(float amount, GameObject damageSource = null)
     {

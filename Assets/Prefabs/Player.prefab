@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 2460823134707737384}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.57, y: -1.41, z: 0.049188394}
+  m_LocalPosition: {x: -0.08, y: -0.1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -136,9 +136,9 @@ Rigidbody2D:
   m_GameObject: {fileID: 8027430821505043370}
   m_BodyType: 0
   m_Simulated: 1
-  m_UseFullKinematicContacts: 0
+  m_UseFullKinematicContacts: 1
   m_UseAutoMass: 0
-  m_Mass: 1
+  m_Mass: 1.187999
   m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_GravityScale: 0
@@ -215,7 +215,19 @@ MonoBehaviour:
     m_ActionId: 6c2ab1b8-8984-453a-af3d-a3c78ae1679a
     m_ActionName: 'Player/Attack[/Mouse/leftButton,/Keyboard/enter]'
   - m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 3401039166925790002}
+        m_TargetAssemblyTypeName: PlayerMovement, Assembly-CSharp
+        m_MethodName: OnInteract
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: 852140f2-7766-474d-8707-702459ba45f3
     m_ActionName: 'Player/Interact[/Keyboard/e]'
   - m_PersistentCalls:
@@ -297,7 +309,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 10
   lastMoveDir: {x: 1, y: 0}
-  firePoint: {fileID: 0}
+  firePoint: {fileID: 3064279820234571430}
 --- !u!95 &4650370356442569710
 Animator:
   serializedVersion: 7
@@ -382,6 +394,7 @@ MonoBehaviour:
   firePoint: {fileID: 3064279820234571430}
   fireRate: 0.2
   projectileSpeed: 10
+  timeReward: 5
   movement: {fileID: 3401039166925790002}
 --- !u!114 &8169679568979283498
 MonoBehaviour:
@@ -401,3 +414,6 @@ MonoBehaviour:
   halfHeart: {fileID: -7363085735459886553, guid: ecbe3c3ea67a29f49b8f3dfb53776bb2, type: 3}
   emptyHeart: {fileID: 7435772165600834056, guid: ecbe3c3ea67a29f49b8f3dfb53776bb2, type: 3}
   healthUiManager: {fileID: 0}
+  damageCooldown: 0.2
+  invulnerabilityFlashRate: 0.1
+  damageFlashColor: {r: 1, g: 0, b: 0, a: 1}

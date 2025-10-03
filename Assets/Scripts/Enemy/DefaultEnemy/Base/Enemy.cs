@@ -3,19 +3,19 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour, IDamageable, IEnemyMoveables, ITriggerCheckAble
 {
-    // Health
     
+    [Header("Health")]
     [field: SerializeField] public float MaxHealth { get; set; } = 10f;
     [SerializeField] protected Animator animator;
     protected bool isDead = false;
 
     public float CurrentHealth { get; set; }
-
-    // Movement
+    [Header("Enemy Movement")]
+    
     public Rigidbody2D RB { get; set; }
     public bool IsFacingRight { get; set; } = true;
-
-    // AI State
+    [Header("AI Settings")]
+   
     public bool IsAggroed { get; set; }
     public bool IsWithInAttackDistance { get; set; }
 
@@ -30,6 +30,9 @@ public class Enemy : MonoBehaviour, IDamageable, IEnemyMoveables, ITriggerCheckA
     [SerializeField] private EnemyIdleSOBase EnemyIdleSOBase;
     [SerializeField] private EnemyChaseSOBase EnemyChaseSOBase;
     [SerializeField] private EnemyAttackSOBase EnemyAttackSOBase;
+
+    public event EnemyDeathDelegate OnEnemyDeath;
+    
 
     public EnemyIdleSOBase EnemyIdleBaseInstance { get; set; }
     public EnemyChaseSOBase EnemyChaseBaseInstance { get; set; }
@@ -79,8 +82,8 @@ public class Enemy : MonoBehaviour, IDamageable, IEnemyMoveables, ITriggerCheckA
      if (isDead) return;
         CurrentHealth -= amount;
         Debug.Log($"Enemy damaged. Current Health: {CurrentHealth}");
-        AnimationTriggerEvent(AnimationTriggerType.EnemyDamaged);
-        animator.SetTrigger("IsTakingDamage");
+       // AnimationTriggerEvent(AnimationTriggerType.EnemyDamaged);
+       // animator.SetTrigger("IsTakingDamage");
 
         if (CurrentHealth <= 0)
         {
@@ -92,11 +95,16 @@ public class Enemy : MonoBehaviour, IDamageable, IEnemyMoveables, ITriggerCheckA
     public virtual void Die()
     {
         if (isDead) return;
-       isDead = true;
+        isDead = true;
+
         GetComponent<Rigidbody2D>().simulated = false;
         GetComponent<Collider2D>().enabled = false;
         Debug.Log("Enemy has died.");
-        
+
+
+        OnEnemyDeath?.Invoke(this);
+        Debug.Log($"Enemy death event triggered for: {gameObject.name}");
+
     }
       public virtual void OnDeathAnimationComplete()
     {

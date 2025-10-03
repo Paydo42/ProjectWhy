@@ -31,8 +31,10 @@ public class EnemyAttackSingleProjectile : EnemyAttackSOBase
                 bullet.linearVelocity = direction * _BulletSpeed;
             }
         }
-        
-        if (UnityEngine.Vector2.Distance(playerTransform.position, enemy.transform.position) > _DistanceToCountExit)
+        if (playerTransform != null)
+        {
+            // Check if the player is far enough to start exiting the attack state
+            if (UnityEngine.Vector2.Distance(playerTransform.position, enemy.transform.position) > _DistanceToCountExit)
             {
                 _ExitTimer += Time.deltaTime;
                 if (_ExitTimer >= _TimeTillExit)
@@ -44,10 +46,10 @@ public class EnemyAttackSingleProjectile : EnemyAttackSOBase
             {
                 _ExitTimer = 0f; // Reset exit timer if within distance
             }
-        _Timer += Time.deltaTime;
-        // Logic for frame updates during attack state can be added here
+            _Timer += Time.deltaTime;
+            // Logic for frame updates during attack state can be added here
+        }
     }
-
     public override void DoExitLogic()
     {
         base.DoExitLogic();
