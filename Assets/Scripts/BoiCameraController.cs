@@ -25,11 +25,11 @@ public class BoiCameraController : MonoBehaviour
         float maxX = activeBounds.xMax - horzExtent;
         float minY = activeBounds.yMin + vertExtent;
         float maxY = activeBounds.yMax - vertExtent;
+        //Apply clamping
+        desired.x = Mathf.Clamp(desired.x, minX, maxX);
+        desired.y = Mathf.Clamp(desired.y, minY, maxY);
 
-        float clampedX = Mathf.Clamp(desired.x, minX, maxX);
-        float clampedY = Mathf.Clamp(desired.y, minY, maxY);
-
-        transform.position = new Vector3(clampedX, clampedY, desired.z);
+          transform.position = desired;
     }
 
     public void SetActiveBounds(Rect bounds)

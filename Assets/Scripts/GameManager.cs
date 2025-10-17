@@ -94,7 +94,7 @@ public class GameManager : MonoBehaviour
         mainMenuUI = GameObject.FindGameObjectWithTag("MainMenuUI");
         pauseMenuUI = GameObject.FindGameObjectWithTag("PauseMenuUI");
         gameOverUI = GameObject.FindGameObjectWithTag("GameOverUI");
-       GameObject timerObj = GameObject.FindGameObjectWithTag("TimerText");
+        GameObject timerObj = GameObject.FindGameObjectWithTag("TimerText");
         if(timerObj != null)
         {
             timerText = timerObj.GetComponentInChildren<TextMeshProUGUI>();
