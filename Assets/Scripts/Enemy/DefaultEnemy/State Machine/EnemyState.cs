@@ -2,8 +2,10 @@ using UnityEngine;
 
 public class EnemyState
 {
+    
     protected Enemy enemy;
     protected EnemyStateMachine stateMachine;
+    
 
     public EnemyState(Enemy enemy, EnemyStateMachine stateMachine)
     {

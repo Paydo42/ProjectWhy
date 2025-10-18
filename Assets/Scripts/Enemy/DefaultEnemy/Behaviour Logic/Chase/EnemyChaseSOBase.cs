@@ -23,7 +23,7 @@ public class EnemyChaseSOBase : ScriptableObject
     {
          if (enemy.IsWithInAttackDistance)
         {
-            enemy.StateMachine.ChangeState(enemy.AttackState);
+            enemy.stateMachine.ChangeState(enemy.AttackState);
         }
     }
     public virtual void DoPhysicsLogic() { }

@@ -13,11 +13,11 @@ public class EnemyChaseDirectToPlayer : EnemyChaseSOBase
         // Logic for frame updates during chase can be added here
         if (enemy.IsWithInAttackDistance)
         {
-            enemy.StateMachine.ChangeState(enemy.AttackState);
+            enemy.stateMachine.ChangeState(enemy.AttackState);
         }
         else if (!enemy.IsAggroed)
         {
-            enemy.StateMachine.ChangeState(enemy.IdleState);
+            enemy.stateMachine.ChangeState(enemy.IdleState);
         }
 
     }

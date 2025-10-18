@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface IEnemyMoveables
+public interface IEnemyMoveable
 {
     Rigidbody2D RB { get; }
     bool IsFacingRight { get; set; }

@@ -23,8 +23,7 @@ public class EnemyIdleSOBase : ScriptableObject
     {
          if (enemy.IsAggroed)
         {
-            enemy.StateMachine.ChangeState(enemy.ChaseState);
-           
+            enemy.stateMachine.ChangeState(enemy.ChaseState);
         }
     }
     public virtual void DoPhysicsLogic() { }

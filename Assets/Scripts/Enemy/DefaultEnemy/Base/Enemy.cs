@@ -1,181 +1,156 @@
-using NUnit.Framework;
 using UnityEngine;
-
-public class Enemy : MonoBehaviour, IDamageable, IEnemyMoveables, ITriggerCheckAble
+using System;
+public class Enemy : MonoBehaviour, IDamageable, IEnemyMoveable, ITriggerCheckAble
 {
-    
-    [Header("Health")]
-    [field: SerializeField] public float MaxHealth { get; set; } = 10f;
-    [SerializeField] protected Animator animator;
-    protected bool isDead = false;
+    public enum AnimationTriggerType
+    {
+        Attack,
+        TakeDamage,
+        Die
+    }
 
-    public float CurrentHealth { get; set; }
-    [Header("Enemy Movement")]
-    
-    public Rigidbody2D RB { get; set; }
-    public bool IsFacingRight { get; set; } = true;
-    [Header("AI Settings")]
-   
-    public bool IsAggroed { get; set; }
-    public bool IsWithInAttackDistance { get; set; }
+    [SerializeField] public EnemyIdleSOBase EnemyIdleBaseInstance;
+    [SerializeField] public EnemyChaseSOBase EnemyChaseBaseInstance;
+    [SerializeField] public EnemyAttackSOBase EnemyAttackBaseInstance;
 
-    #region State Machine Variables
-    public EnemyStateMachine StateMachine { get; private set; }
+    // --- FIX: Create properties to hold instances of each state ---
     public EnemyIdleState IdleState { get; private set; }
     public EnemyChaseState ChaseState { get; private set; }
     public EnemyAttackState AttackState { get; private set; }
-    #endregion
 
-    #region Scriptable Object Variables
-    [SerializeField] private EnemyIdleSOBase EnemyIdleSOBase;
-    [SerializeField] private EnemyChaseSOBase EnemyChaseSOBase;
-    [SerializeField] private EnemyAttackSOBase EnemyAttackSOBase;
+    // Pooling and Activation Logic
+    public GameObject OriginalPrefab { get; set; }
+    private RoomBounds parentRoom;
+    private bool isActivated = false;
 
-    public event EnemyDeathDelegate OnEnemyDeath;
+    // Core Components and Stats
+    public EnemyStateMachine stateMachine { get; set; }
+    public Animator animator { get; set; }
+    public Enemy_Scriptable_Object enemyData;
     
+    public Rigidbody2D RB { get; set; }
+    
+    public float MaxHealth { get; set; }
+    public float CurrentHealth { get; set; }
+    
+    public event EnemyDeathDelegate OnEnemyDeath;
 
-    public EnemyIdleSOBase EnemyIdleBaseInstance { get; set; }
-    public EnemyChaseSOBase EnemyChaseBaseInstance { get; set; }
-    public EnemyAttackSOBase EnemyAttackBaseInstance { get; set; }
-    #endregion
+    // State Machine Triggers
+    public ITriggerCheckAble AggroCheck { get; set; }
+    public ITriggerCheckAble AttackDistanceCheck { get; set; }
 
-    #region Unity Lifecycle
-    private void Awake()
+    public virtual void Awake()
     {
-        EnemyIdleBaseInstance = Instantiate(EnemyIdleSOBase);
-        EnemyChaseBaseInstance = Instantiate(EnemyChaseSOBase);
-        EnemyAttackBaseInstance = Instantiate(EnemyAttackSOBase);
+        stateMachine = new EnemyStateMachine();
 
-        StateMachine = new EnemyStateMachine();
+        // --- FIX: Create the state instances here ---
+        IdleState = new EnemyIdleState(this, stateMachine);
+        ChaseState = new EnemyChaseState(this, stateMachine);
+        AttackState = new EnemyAttackState(this, stateMachine);
 
-        IdleState = new EnemyIdleState(this, StateMachine);
-        ChaseState = new EnemyChaseState(this, StateMachine);
-        AttackState = new EnemyAttackState(this, StateMachine);
-    }
-
-    private void Start()
-    {
-        CurrentHealth = MaxHealth;
+        animator = GetComponentInChildren<Animator>();
         RB = GetComponent<Rigidbody2D>();
+
+        AggroCheck = GetComponentInChildren<EnemyAggroCheck>() as ITriggerCheckAble;
+        AttackDistanceCheck = GetComponentInChildren<EnemyAttacktingDistanceCheck>() as ITriggerCheckAble;
+
+        EnemyIdleBaseInstance = Instantiate(EnemyIdleBaseInstance);
+        EnemyChaseBaseInstance = Instantiate(EnemyChaseBaseInstance);
+        EnemyAttackBaseInstance = Instantiate(EnemyAttackBaseInstance);
 
         EnemyIdleBaseInstance.Initialize(gameObject, this);
         EnemyChaseBaseInstance.Initialize(gameObject, this);
         EnemyAttackBaseInstance.Initialize(gameObject, this);
-
-        StateMachine.Initialize(IdleState);
     }
 
-    private void Update()
+    public virtual void Update()
     {
-        StateMachine.CurrentEnemyState.FrameUpdate();
-    }
+        if (!isActivated) return;
 
-    private void FixedUpdate()
-    {
-        StateMachine.CurrentEnemyState.PhysicsUpdate();
-    }
-    #endregion
-
-    #region Health & Damage
-    public void TakeDamage(float amount)
-    {
-     if (isDead) return;
-        CurrentHealth -= amount;
-        Debug.Log($"Enemy damaged. Current Health: {CurrentHealth}");
-       // AnimationTriggerEvent(AnimationTriggerType.EnemyDamaged);
-       // animator.SetTrigger("IsTakingDamage");
-
-        if (CurrentHealth <= 0)
+        if (stateMachine.CurrentEnemyState != null)
         {
-            AnimationTriggerEvent(AnimationTriggerType.Death);
-
+            stateMachine.CurrentEnemyState.FrameUpdate();
         }
+    }
+
+    public virtual void FixedUpdate()
+    {
+        if (!isActivated) return;
+
+        if (stateMachine.CurrentEnemyState != null)
+        {
+            stateMachine.CurrentEnemyState.PhysicsUpdate();
+        }
+    }
+
+    public void Activate(RoomBounds room, GameObject prefab)
+    {
+        parentRoom = room;
+        OriginalPrefab = prefab;
+        
+        MaxHealth = enemyData.maxHealth; 
+        CurrentHealth = MaxHealth; 
+        
+        gameObject.SetActive(true);
+        isActivated = true;
+
+        // --- FIX: Initialize with the pre-made IdleState instance ---
+        stateMachine.Initialize(IdleState);
+        Debug.Log($"{name} has been activated!");
+    }
+
+    public void Deactivate()
+    {
+        isActivated = false;
+        gameObject.SetActive(false);
     }
 
     public virtual void Die()
     {
-        if (isDead) return;
-        isDead = true;
-
-        GetComponent<Rigidbody2D>().simulated = false;
-        GetComponent<Collider2D>().enabled = false;
-        Debug.Log("Enemy has died.");
-
-
+        isActivated = false;
         OnEnemyDeath?.Invoke(this);
-        Debug.Log($"Enemy death event triggered for: {gameObject.name}");
-
+        if(animator != null) { animator.SetTrigger("Die"); }
     }
-      public virtual void OnDeathAnimationComplete()
+
+    public virtual void OnDeathAnimationComplete()
     {
-        
-        Destroy(gameObject);
+        Debug.Log($"{name} death animation complete. Returning to pool.");
+        if (PoolManager.Instance != null && OriginalPrefab != null)
+        {
+            PoolManager.Instance.ReturnToPool(gameObject, OriginalPrefab);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
-    #endregion
 
-    #region Movement
+    public virtual void TakeDamage(float damageAmount)
+    {
+        if (!isActivated) return;
+        CurrentHealth -= damageAmount;
+        if(animator != null) { animator.SetTrigger("TakeDamage"); }
+        if (CurrentHealth <= 0) { Die(); }
+    }
+
     public void MoveEnemy(Vector2 velocity)
     {
+        if (!isActivated) return;
         RB.linearVelocity = velocity;
         CheckForLeftOrRightFacing(velocity);
     }
 
+    public bool IsFacingRight { get; set; }
+    public bool IsAggroed { get; set; }
+    public bool IsWithInAttackDistance { get; set; } 
+
+    public void SetAggroStatus(bool isAggroed) { IsAggroed = isAggroed; }
+    public void SetAttackDistanceStatus(bool isWithinStrikingDistance) { IsWithInAttackDistance = isWithinStrikingDistance; }
+
     public void CheckForLeftOrRightFacing(Vector2 velocity)
     {
-        if (IsFacingRight && velocity.x < 0f)
-        {
-            Vector3 rotator = new(transform.rotation.x, 180f, transform.rotation.z);
-            transform.rotation = Quaternion.Euler(rotator);
-            IsFacingRight = false;
-            //IsFacingRight = !IsFacingRight; // Toggle facing direction
-        }
-        else if (!IsFacingRight && velocity.x > 0f)
-        {
-            Vector3 rotator = new(transform.rotation.x, 0f, transform.rotation.z);
-            transform.rotation = Quaternion.Euler(rotator);
-            IsFacingRight = true;
-            //IsFacingRight = !IsFacingRight; // Toggle facing direction
-        }
+        if (velocity.x > 0.01f) { IsFacingRight = true; }
+        else if (velocity.x < -0.01f) { IsFacingRight = false; }
     }
-    #endregion
-
-    #region Animation Trigger Event
-    public void AnimationTriggerEvent(AnimationTriggerType triggerType)
-    {
-        StateMachine.CurrentEnemyState.AnimationTriggerEvent(triggerType);
-        switch (triggerType)
-        {
-            case AnimationTriggerType.EnemyDamaged:
-                // Logic for when the enemy is damaged
-                break;
-            case AnimationTriggerType.PlayFootstepSound:
-                // Logic for playing footstep sound
-                break;
-            case AnimationTriggerType.Death:
-                // Logic for death animation
-                Die();
-                Debug.Log("Enemy death animation triggered.");
-                break;
-        }
-    }
-
-    public enum AnimationTriggerType
-    {
-        EnemyDamaged,
-        PlayFootstepSound,
-        Death
-    }
-    #endregion
-
-    #region Distance Check
-    public void SetAggroStatus(bool isAggroed)
-    {
-        IsAggroed = isAggroed;
-    }
-
-    public void SetAttackDistanceStatus(bool isWithInAttackDistance)
-    {
-        IsWithInAttackDistance = isWithInAttackDistance;
-    }
-    #endregion
 }
+

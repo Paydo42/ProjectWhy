@@ -1,82 +1,74 @@
 using UnityEngine;
-using System.Collections;
 
-public class PlayerProjectile : MonoBehaviour
+public class Projectile : MonoBehaviour 
 {
+    public float speed = 10f;
     public float lifetime = 2f;
-    public int damage = 1;
-    public LayerMask collisionLayers;
-    
-    private PoolManager poolManager;
-    
-    void Start()
+    public float damage = 1f;
+
+    public GameObject OriginalPrefab { get; private set; }
+    private Rigidbody2D rb;
+
+    void Awake()
     {
-        // Find pool manager
-        poolManager = FindAnyObjectByType<PoolManager>();
-        // Start lifetime coroutine
-        StartCoroutine(ReturnAfterLifetime());
+        rb = GetComponent<Rigidbody2D>();
     }
-    
+
     void OnEnable()
     {
-        // Reset any state when the object is reused from pool
-        Rigidbody2D rb = GetComponent<Rigidbody2D>();
+        // When the projectile is activated from the pool, start a timer to deactivate it
+        Invoke(nameof(ReturnToPool), lifetime);
+    }
+
+    public void Initialize(GameObject prefab)
+    {
+        OriginalPrefab = prefab;
+    }
+
+    // --- THE MAIN FIX ---
+    // This new function handles both movement and rotation.
+    public void Fire(Vector2 direction)
+    {
+        Debug.Log($"Projectile received direction: {direction}");
         if (rb != null)
         {
-            rb.linearVelocity = Vector2.zero;
+            // 1. Set the movement velocity based on the direction
+            rb.linearVelocity = direction.normalized * speed;
+
+            // 2. Calculate the angle from the direction vector
+            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+            Debug.Log($"Calculated Angle: {angle}");
+            // 3. Set the rotation of the arrow's sprite to match the angle
+             transform.rotation = Quaternion.Euler(0, 0, angle - 90f);
         }
-        
-        // Restart lifetime coroutine when object is reused
-        StopAllCoroutines();
-        StartCoroutine(ReturnAfterLifetime());
     }
-    
-    IEnumerator ReturnAfterLifetime()
-    {
-        yield return new WaitForSeconds(lifetime);
-        ReturnToPool();
-    }
-    
+
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (((1 << other.gameObject.layer) & collisionLayers) != 0)
+        IDamageable damageable = other.GetComponent<IDamageable>();
+        if (damageable != null && other.CompareTag("Enemy"))
         {
-            Debug.Log($"Projectile hit layer: {LayerMask.LayerToName(other.gameObject.layer)}");
-
-            // Enemy handling
-            if (other.CompareTag("Enemy"))
-            {
-                if (other.TryGetComponent<EnemyHealth>(out var enemyHealth))
-                {
-                    enemyHealth.TakeDamage(damage);
-                    Debug.Log($"Dealt {damage} damage to enemy");
-                }
-                if (other.TryGetComponent<Enemy>(out var enemy))
-                {
-                    enemy.TakeDamage(damage);
-                    Debug.Log($"Dealt {damage} damage to enemy via Enemy component");
-                }
-            }
-
-            // Return to pool instead of Destroy
-            ReturnToPool();
+            damageable.TakeDamage(damage);
         }
-        else
-        {
-            Debug.Log($"Ignoring collision with: {other.name} (Layer: {LayerMask.LayerToName(other.gameObject.layer)})");
-        }
+
+        // Return to the pool immediately upon hitting anything
+        ReturnToPool();
     }
-    
-    void ReturnToPool()
+
+    private void ReturnToPool()
     {
-        if (poolManager != null)
+        // Stop the lifetime timer in case we hit something early
+        CancelInvoke();
+
+        if (PoolManager.Instance != null && OriginalPrefab != null)
         {
-            poolManager.ReturnObjectToPool(gameObject);
+            PoolManager.Instance.ReturnToPool(gameObject, OriginalPrefab);
         }
         else
         {
-            // Fallback to Destroy if pool manager not found
-            Destroy(gameObject);
+            // Fallback in case the pool manager is not available
+            gameObject.SetActive(false);
         }
     }
 }
+

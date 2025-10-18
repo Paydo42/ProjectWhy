@@ -28,7 +28,14 @@ public class EnemyChaseState : EnemyState
     {
         base.FrameUpdate();
         enemy.EnemyChaseBaseInstance.DoFrameUpdateLogic();
-     
+         if (!enemy.IsAggroed)
+        {
+            stateMachine.ChangeState(enemy.IdleState);
+        }
+        else if (enemy.IsWithInAttackDistance)
+        {
+            stateMachine.ChangeState(enemy.AttackState);
+        }
     }
 
     public override void PhysicsUpdate()

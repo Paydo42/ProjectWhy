@@ -1,18 +1,18 @@
 using UnityEngine;
 using System.Collections.Generic;
-using System.Numerics;
 
 [RequireComponent(typeof(BoxCollider2D))]
 public class RoomBounds : MonoBehaviour
 {
     [Header("Camera Settings")]
-    private BoxCollider2D box;
+    private BoxCollider2D BoxCollider;
 
     [Header("Enemy Tracking")]
     private List<Enemy> enemiesInRoom = new List<Enemy>();
     private bool rewardSpawned = false;
     private bool roomActive = false;
-    private bool playerIsInRoom = false;
+    private bool playerIsInRoom = false; // --- We will use this to run a check
+
     [Header("Door Settings")]
     public List<Door> roomDoors = new List<Door>();
     
@@ -25,10 +25,11 @@ public class RoomBounds : MonoBehaviour
 
     private List<Upgrade> currentUpgrades = new List<Upgrade>();
     private BoiCameraController cameraController;
+
     void Awake()
     {
-        box = GetComponent<BoxCollider2D>();
-        box.isTrigger = true;  // make sure the collider is a trigger
+        BoxCollider = GetComponent<BoxCollider2D>();
+        BoxCollider.isTrigger = true; 
         FindAllEnemiesInRoom();
         cameraController = Camera.main.GetComponent<BoiCameraController>();
     }
@@ -42,7 +43,7 @@ public class RoomBounds : MonoBehaviour
         {
             enemy.OnEnemyDeath += HandleEnemyDeath;
         }
-     if (enemiesInRoom.Count == 0)
+        if (enemiesInRoom.Count == 0)
         {
             UnlockDoors();
         }
@@ -52,40 +53,55 @@ public class RoomBounds : MonoBehaviour
     {
         if (!other.CompareTag("Player")) return;
 
-        playerIsInRoom = true;
-       
-        // take bounds from the box collider
+        playerIsInRoom = true; // --- We just set this to TRUE
+        
+        // take bounds from the BoxCollider collider
         Rect bounds = new Rect(
-            box.bounds.min.x,
-            box.bounds.min.y,
-            box.bounds.size.x,
-            box.bounds.size.y
+            BoxCollider.bounds.min.x,
+            BoxCollider.bounds.min.y,
+            BoxCollider.bounds.size.x,
+            BoxCollider.bounds.size.y
         );
 
-         // Set camera bounds
+        // Set camera bounds
         if (cameraController != null)
-        cameraController.SetActiveBounds(bounds);
+            cameraController.SetActiveBounds(bounds);
+        
+        // --- We NO LONGER activate the room here.
+    }
 
-        // Activate room and lock doors if enemies are present
-        if (!roomActive && enemiesInRoom.Count > 0)
+    // --- NEW UPDATE FUNCTION ---
+    // We will check every frame if the player is in the zone and if we should activate
+    void Update()
+    {
+        // Do nothing if player isn't in the trigger, or room is already active, or no enemies
+        if (!playerIsInRoom || roomActive || enemiesInRoom.Count == 0)
+        {
+            return;
+        }
+
+        // --- THE FIX ---
+        // Check if the player's CENTER is inside the BoxCollider bounds
+        if (BoxCollider.bounds.Contains(Player.Instance.transform.position))
         {
             ActivateRoom();
         }
     }
-       void OnTriggerExit2D(Collider2D other)
+    
+    void OnTriggerExit2D(Collider2D other)
     {
         if (!other.CompareTag("Player")) return;
-        playerIsInRoom = false;
+        playerIsInRoom = false; // --- We just set this to FALSE
     }
 
-     private void ActivateRoom()
+    // --- This is now a PRIVATE function again
+    private void ActivateRoom()
     {
         roomActive = true;
-
-    
-            LockDoors();
-         Debug.Log($"Room activated: {gameObject.name}, Enemies: {enemiesInRoom.Count}");
+        LockDoors();
+        Debug.Log($"Room activated: {gameObject.name}, Enemies: {enemiesInRoom.Count}");
     }
+    
     private void LockDoors()
     {
         foreach (Door door in roomDoors)
@@ -93,13 +109,15 @@ public class RoomBounds : MonoBehaviour
             if (door != null) door.CloseAndLock();
         }
     }
-      private void UnlockDoors()
+    
+    private void UnlockDoors()
     {
         foreach (Door door in roomDoors)
         {
             if (door != null) door.Open();
         }
     }
+    
     private void HandleEnemyDeath(Enemy deadEnemy)
     {
         enemiesInRoom.Remove(deadEnemy);
@@ -109,66 +127,52 @@ public class RoomBounds : MonoBehaviour
         {
             RoomCleared();
             Debug.Log("All enemies defeated, spawning reward.");
-
         }
     }
+    
     private void RoomCleared()
     {
         Debug.Log("Room cleared! Unlocking doors and spawning reward.");
-
-        // unlock doors
         UnlockDoors();
-
-        // Spawn reward
         SpawnRandomReward();
         rewardSpawned = true;
         roomActive = false;
     }
-      public bool ContainsPlayer()
+    
+    public bool ContainsPlayer()
     {
         if (!playerIsInRoom) return false;
-
-        // Get the player's position in 2D space
         Vector2 playerPosition = new Vector2(Player.Instance.transform.position.x, Player.Instance.transform.position.y);
-        // Check if the player's position is within this BoxCollider2D's bounds
-        return box.bounds.Contains(playerPosition);
+        return BoxCollider.bounds.Contains(playerPosition);
     }
+    
+    
     private void SpawnRandomReward()
     {
         if (Random.value > spawnChance) return;
         if (spawnablePrefabs.Count == 0) return;
 
-        // Clear any existing rewards
         ClearExistingRewards();
-
-        // Determine how many rewards to spawn
         int rewardCount = Random.Range(minRewards, maxRewards + 1);
-
-        // Create a list of available spawn positions
         List<Transform> availableSpawnPoints = new List<Transform>(spawnPoints);
 
         for (int i = 0; i < rewardCount; i++)
         {
-            if (availableSpawnPoints.Count == 0) break;
-            if (spawnablePrefabs.Count == 0) break;
+            if (availableSpawnPoints.Count == 0 || spawnablePrefabs.Count == 0) break;
 
-            // Select random prefab
             int prefabIndex = Random.Range(0, spawnablePrefabs.Count);
             GameObject prefabToSpawn = spawnablePrefabs[prefabIndex];
 
-            // Select random spawn point
             int spawnIndex = Random.Range(0, availableSpawnPoints.Count);
             Transform spawnPoint = availableSpawnPoints[spawnIndex];
             availableSpawnPoints.RemoveAt(spawnIndex);
 
-            UnityEngine.Vector3 spawnPosition = spawnPoint.position;
-            spawnPosition.z = 0f;
-            // Create reward
-            GameObject reward = Instantiate(prefabToSpawn, spawnPosition, UnityEngine.Quaternion.identity, transform);
-            UnityEngine.Vector3 fixedPos = reward.transform.position;
+            GameObject reward = Instantiate(prefabToSpawn, spawnPoint.position, Quaternion.identity, transform);
+            
+            Vector3 fixedPos = reward.transform.position;
             fixedPos.z = 0f;
             reward.transform.position = fixedPos;
-            // Get the Upgrade component
+            
             Upgrade upgrade = reward.GetComponent<Upgrade>();
             if (upgrade != null)
             {
@@ -176,6 +180,7 @@ public class RoomBounds : MonoBehaviour
             }
         }
     }
+    
     public void ClearExistingRewards()
     {
         foreach (Upgrade upgrade in currentUpgrades)
@@ -187,18 +192,17 @@ public class RoomBounds : MonoBehaviour
         }
         currentUpgrades.Clear();
     }
+    
     public void PlayerSelectedUpgrade(Upgrade selectedUpgrade)
     {
         foreach (Upgrade upgrade in currentUpgrades)
         {
             if (upgrade != selectedUpgrade && upgrade != null)
             {
-                // Play disappear animation
                 Animator anim = upgrade.GetComponent<Animator>();
                 if (anim != null)
                 {
                     anim.SetTrigger("Disappear");
-
                 }
                 else
                 {
@@ -208,16 +212,20 @@ public class RoomBounds : MonoBehaviour
         }
         currentUpgrades.Clear();
     }
+    
     private void OnDestroy()
     {
         foreach (Enemy enemy in enemiesInRoom)
         {
             if (enemy != null)
+            {
                 enemy.OnEnemyDeath -= HandleEnemyDeath;
-            Debug.Log($"Unsubscribed from enemy death event for: {enemy.name}");
+                Debug.Log($"Unsubscribed from enemy death event for: {enemy.name}");
+            }
         }
     }
-     public void DebugRoomInfo()
+    
+    public void DebugRoomInfo()
     {
         Debug.Log($"Room: {gameObject.name}, Active: {roomActive}, Enemies: {enemiesInRoom.Count}, RewardSpawned: {rewardSpawned}");
     }

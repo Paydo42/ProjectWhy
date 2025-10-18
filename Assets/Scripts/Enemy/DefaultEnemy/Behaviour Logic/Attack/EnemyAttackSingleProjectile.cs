@@ -39,7 +39,7 @@ public class EnemyAttackSingleProjectile : EnemyAttackSOBase
                 _ExitTimer += Time.deltaTime;
                 if (_ExitTimer >= _TimeTillExit)
                 {
-                    enemy.StateMachine.ChangeState(enemy.ChaseState);
+                    enemy.stateMachine.ChangeState(enemy.ChaseState);
                 }
             }
             else

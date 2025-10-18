@@ -21,6 +21,10 @@ public class EnemyIdleState : EnemyState
     {
         base.FrameUpdate();
         enemy.EnemyIdleBaseInstance.DoFrameUpdateLogic();
+          if (enemy.IsAggroed)
+        {
+            stateMachine.ChangeState(enemy.ChaseState);
+        }
       
     }
     public override void PhysicsUpdate()

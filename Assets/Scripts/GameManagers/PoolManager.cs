@@ -1,45 +1,66 @@
-using System.Collections;
-using Unity.Mathematics;
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class PoolManager : MonoBehaviour
 {
-    public GameObject projectilePrefab;
-    public int poolSize = 20;
-    private Queue<GameObject> projectilePool = new Queue<GameObject>();
+    public static PoolManager Instance { get; private set; }
 
-    void Start()
+    private Dictionary<GameObject, Queue<GameObject>> pools = new Dictionary<GameObject, Queue<GameObject>>();
+
+    void Awake()
     {
-        InitializePool  ();
-    }
-    void InitializePool()
-    {
-        for (int i = 0; i < poolSize; i++)
+        if (Instance == null)
         {
-            var obj = Instantiate(projectilePrefab);
-            obj.SetActive(false);
-            projectilePool.Enqueue(obj);
-        }
-    }
-    public GameObject GetObjectFromPool()
-    {
-        if (projectilePool.Count > 0)
-        {
-            var obj = projectilePool.Dequeue();
-            obj.SetActive(true);
-            return obj;
+            Instance = this;
         }
         else
         {
-            //create new object if pool is empty
-            var newObj = Instantiate(projectilePrefab);
-            return newObj;
+            Destroy(gameObject);
         }
     }
-    public void ReturnObjectToPool(GameObject obj)
+
+    public GameObject Spawn(GameObject prefab, Vector3 position, Quaternion rotation)
     {
-        obj.SetActive(false);
-        projectilePool.Enqueue(obj);
+        if (!pools.ContainsKey(prefab))
+        {
+            pools.Add(prefab, new Queue<GameObject>());
+        }
+
+        GameObject objectToSpawn;
+
+        if (pools[prefab].Count > 0)
+        {
+            objectToSpawn = pools[prefab].Dequeue();
+        }
+        else
+        {
+            objectToSpawn = Instantiate(prefab);
+            // This ensures new objects are parented to the PoolManager for organization
+            objectToSpawn.transform.SetParent(this.transform);
+        }
+
+        objectToSpawn.transform.position = position;
+        objectToSpawn.transform.rotation = rotation;
+        objectToSpawn.SetActive(true);
+
+        return objectToSpawn;
+    }
+
+    public void ReturnToPool(GameObject objectToReturn, GameObject originalPrefab)
+    {
+        if (originalPrefab == null)
+        {
+            Destroy(objectToReturn);
+            return;
+        }
+
+        if (!pools.ContainsKey(originalPrefab))
+        {
+             pools.Add(originalPrefab, new Queue<GameObject>());
+        }
+        
+        objectToReturn.SetActive(false);
+        pools[originalPrefab].Enqueue(objectToReturn);
     }
 }
+
