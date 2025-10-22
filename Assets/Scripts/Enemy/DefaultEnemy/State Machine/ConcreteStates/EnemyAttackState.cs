@@ -1,9 +1,7 @@
-using System.Numerics;
 using UnityEngine;
 
 public class EnemyAttackState : EnemyState
 {
-   
     public EnemyAttackState(Enemy enemy, EnemyStateMachine stateMachine) : base(enemy, stateMachine)
     {
     }
@@ -11,41 +9,37 @@ public class EnemyAttackState : EnemyState
     public override void EnterState()
     {
         base.EnterState();
-        Debug.Log("Entering Attack State");
+        // The specific behavior (like CircleAndShoot) handles its own entry logic
         enemy.EnemyAttackBaseInstance.DoEnterLogic();
-        // Additional logic for entering attack state can be added here
     }
 
     public override void ExitState()
     {
         base.ExitState();
-        Debug.Log("Exiting Attack State");
+        // The specific behavior handles its own exit logic
         enemy.EnemyAttackBaseInstance.DoExitLogic();
-        // Additional logic for exiting attack state can be added here
     }
 
     public override void FrameUpdate()
     {
-
         base.FrameUpdate();
+        // --- THIS IS THE FIX ---
+        // We only call the behavior's update logic.
+        // The behavior script itself is now responsible for deciding when to change state.
+        // We have REMOVED the line: if (!enemy.IsWithInAttackDistance) { stateMachine.ChangeState(enemy.ChaseState); }
         enemy.EnemyAttackBaseInstance.DoFrameUpdateLogic();
-           if (!enemy.IsWithInAttackDistance)
-        {
-            stateMachine.ChangeState(enemy.ChaseState);
-        }
     }
 
     public override void PhysicsUpdate()
     {
         base.PhysicsUpdate();
         enemy.EnemyAttackBaseInstance.DoPhysicsLogic();
-        // Logic for physics updates during attack state can be added here
     }
 
     public override void AnimationTriggerEvent(Enemy.AnimationTriggerType triggerType)
     {
         base.AnimationTriggerEvent(triggerType);
         enemy.EnemyAttackBaseInstance.DoAnimationTriggerEventLogic(triggerType);
-        // Handle animation trigger events specific to attack state
     }
 }
+

@@ -2,7 +2,16 @@ using UnityEngine;
 
 public class Angel : Enemy
 {
-    public override void Die()
+    
+         // For example, you might want to play a special animation or sound effect
+           public override void OnDeathAnimationComplete()
+    {
+
+        base.OnDeathAnimationComplete();
+         Debug.Log("Angel-specific death animation complete logic.");
+    }
+}
+     /* public override void Die()
     {   
            base.Die();
     
@@ -17,7 +26,5 @@ public class Angel : Enemy
         // Temel yok etme işlemi
         base.OnDeathAnimationComplete();
     }
-       
-         // For example, you might want to play a special animation or sound effect
-    
-}
+    */ 
+

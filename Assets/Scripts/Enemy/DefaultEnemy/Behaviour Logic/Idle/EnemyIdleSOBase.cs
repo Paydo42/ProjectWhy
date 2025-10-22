@@ -2,11 +2,9 @@ using UnityEngine;
 
 public class EnemyIdleSOBase : ScriptableObject
 {
-
     protected Enemy enemy;
     protected Transform transform;
     protected GameObject gameObject;
-
     protected Transform playerTransform;
 
     public virtual void Initialize(GameObject gameObject, Enemy enemy)
@@ -14,20 +12,23 @@ public class EnemyIdleSOBase : ScriptableObject
         this.gameObject = gameObject;
         transform = gameObject.transform;
         this.enemy = enemy;
-
         playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
     }
     public virtual void DoEnterLogic() { }
-    public virtual void DoExitLogic() {ResetValues(); }
+    public virtual void DoExitLogic() { ResetValues(); }
+
     public virtual void DoFrameUpdateLogic()
     {
-         if (enemy.IsAggroed)
+        // --- THIS IS THE FIX ---
+        // The default logic for all Idle states is now here.
+        // If the enemy becomes aggroed, it should try to chase.
+        if (enemy.IsAggroed)
         {
             enemy.stateMachine.ChangeState(enemy.ChaseState);
         }
     }
+
     public virtual void DoPhysicsLogic() { }
     public virtual void DoAnimationTriggerEventLogic(Enemy.AnimationTriggerType triggerType) { }
     public virtual void ResetValues() { }
-
 }

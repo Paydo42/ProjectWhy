@@ -12,6 +12,7 @@ TagManager:
   - PauseMenuUI
   - GameOverUI
   - TimerText
+  - Wall
   layers:
   - Default
   - TransparentFX
@@ -24,7 +25,7 @@ TagManager:
   - PlayerProjectile
   - EnemyProjectile
   - Objects
-  - 
+  - Walls
   - 
   - 
   - 

@@ -4,7 +4,7 @@ public class EnemyAttackSingleProjectile : EnemyAttackSOBase
 {
     [SerializeField] private Rigidbody2D BulletPrefab;
     [SerializeField] private float _TimeBetweenAttacks = 1f;
-    [SerializeField] private float _TimeTillExit = 2f;
+    [SerializeField] private float _TimeTillExit = 0.1f;
     [SerializeField] private float _DistanceToCountExit = 3f;
     [SerializeField] private float _BulletSpeed = 10f;
 
