@@ -1,117 +1,49 @@
+// Full Path: Assets/Scripts/Enemy/DefaultEnemy/Behaviour Logic/Attack/EnemyAttackCircleAndShoot.cs
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Attack_CircleAndShoot", menuName = "Enemy Logic/Attack Logic/Circle and Shoot")]
+// This ScriptableObject now primarily holds configuration data for the Circle and Shoot attack pattern.
+// The actual movement logic is in CircleTargetBehaviour, and shooting logic is in EnemyAttackState.
+[CreateAssetMenu(fileName = "Attack_CircleAndShoot_Data", menuName = "Enemy Logic/Attack Logic Data/Circle and Shoot Data")]
 public class EnemyAttackCircleAndShoot : EnemyAttackSOBase
 {
-    [Header("Shooting")]
-    [SerializeField] private GameObject bulletPrefab;
-    [SerializeField] private float timeBetweenAttacks = 1f;
-    [SerializeField] private float bulletSpeed = 10f;
-    private float _timer;
+    [Header("Shooting Config")]
+    public GameObject bulletPrefab;
+    public float timeBetweenAttacks = 1f;
+    public float bulletSpeed = 10f;
 
-    [Header("Movement")]
-    [SerializeField] private float circleSpeed = 4f;
-    [SerializeField] private float preferredShootingRange = 5f;
-    [SerializeField] private float rangeDeadZone = 1f;
-    [SerializeField, Tooltip("How quickly the enemy turns towards the desired direction. Lower values are slower/smoother.")]
-    private float turnSpeed = 5f; // Added for smoothing
-    
-    [Header("Obstacle Avoidance")]
-    [SerializeField] private LayerMask obstacleLayerMask;
-    [SerializeField] private float obstacleCheckDistance = 1f;
-    // --- FIX: Re-added collider size reduction ---
-    [SerializeField, Tooltip("How much smaller the detection box should be than the feeler collider.")]
-    private float colliderSizeReduction = 0.05f;
-    
-    private int circleDirection = 1;
+    [Header("Circling Config (Read by State & Behaviour)")]
+    public float circleSpeed = 4f; // Note: AgentMover speed might override this unless CircleTargetBehaviour uses it
+    public float preferredShootingRange = 5f; // Read by CircleTargetBehaviour
+    public float minimumDistance = 4f;       // Read by CircleTargetBehaviour (renamed from rangeDeadZone)
+    public float circleSwitchInterval = 5.0f; // Read by EnemyAttackState
 
+    // Example of simple setup logic remaining in the SO
+    private int _internalCircleDirection = 1; // Keep internal state private if possible
+
+    // Called by EnemyAttackState.EnterState
     public override void DoEnterLogic()
     {
         base.DoEnterLogic();
-        circleDirection = (Random.value > 0.5f) ? 1 : -1;
+        // Example: Randomize direction when attack starts
+        _internalCircleDirection = (Random.value > 0.5f) ? 1 : -1;
+        // NOTE: EnemyAttackState should read this value AFTER calling DoEnterLogic
+        // and pass it to CircleTargetBehaviour.clockwise
+        Debug.Log("CircleAndShoot SO: Set internal circle direction to " + _internalCircleDirection);
     }
 
-    public override void DoFrameUpdateLogic()
+    // Public getter for the state to retrieve the chosen direction
+    public int GetCircleDirection()
     {
-        base.DoFrameUpdateLogic();
-
-        Vector2 directionToPlayer = (playerTransform.position - enemy.transform.position).normalized;
-        float distanceToPlayer = Vector2.Distance(playerTransform.position, enemy.transform.position);
-
-        Vector2 circleMovement = new Vector2(directionToPlayer.y, -directionToPlayer.x) * circleDirection;
-        Vector2 rangeCorrectionMovement = Vector2.zero;
-
-        if (distanceToPlayer > preferredShootingRange)
-        {
-            rangeCorrectionMovement = directionToPlayer;
-        }
-        else if (distanceToPlayer < preferredShootingRange - rangeDeadZone)
-        {
-            rangeCorrectionMovement = -directionToPlayer;
-        }
-        
-        Vector2 desiredMoveDirection = (circleMovement + rangeCorrectionMovement).normalized;
-
-        Vector2 boxSize = enemy.avoidanceCollider.size - Vector2.one * colliderSizeReduction; // Use reduction
-        RaycastHit2D hit = Physics2D.BoxCast(enemy.transform.position, boxSize, 0f, desiredMoveDirection, obstacleCheckDistance, obstacleLayerMask);
-
-        Vector2 targetMoveDirection;
-        if (hit.collider != null)
-        {
-            Vector2 slideDirection = desiredMoveDirection - (Vector2)Vector3.Project(desiredMoveDirection, hit.normal);
-            
-             // --- FIX: Prevent normalizing zero vector ---
-            if (slideDirection.sqrMagnitude > Mathf.Epsilon)
-            {
-                targetMoveDirection = slideDirection.normalized;
-            }
-             else
-            {
-                 targetMoveDirection = new Vector2(hit.normal.y, -hit.normal.x);
-                 if (Vector2.Dot(targetMoveDirection, desiredMoveDirection) < 0) {
-                     targetMoveDirection = -targetMoveDirection;
-                 }
-            }
-        }
-        else
-        {
-            targetMoveDirection = desiredMoveDirection;
-        }
-        
-        // --- FIX: Smoothly interpolate the current velocity towards the target direction ---
-        Vector2 smoothedVelocity = Vector2.Lerp(
-            enemy.RB.linearVelocity, // Current velocity
-            targetMoveDirection * circleSpeed,
-            Time.deltaTime * turnSpeed
-        );
-
-        enemy.MoveEnemy(smoothedVelocity); // Apply smoothed velocity
-
-        _timer += Time.deltaTime;
-        if (_timer >= timeBetweenAttacks)
-        {
-            _timer = 0f;
-            if (bulletPrefab != null && PoolManager.Instance != null)
-            {
-                GameObject bulletObj = PoolManager.Instance.Spawn(bulletPrefab, enemy.transform.position, Quaternion.identity);
-                EnemyProjectile bullet = bulletObj.GetComponent<EnemyProjectile>();
-                if (bullet != null)
-                {
-                    bullet.Initialize(bulletPrefab);
-                    bullet.SetDirection(directionToPlayer, bulletSpeed);
-                }
-            }
-        }
-        
-        if (!enemy.IsWithInAttackDistance)
-        {
-             enemy.stateMachine.ChangeState(enemy.IdleState);
-        }
+        return _internalCircleDirection;
     }
 
-    public override void ResetValues()
-    {
-        base.ResetValues();
-        _timer = 0f;
-    }
+    // --- REMOVED / EMPTY LOGIC ---
+    public override void DoFrameUpdateLogic() { /* Intentionally empty */ }
+    public override void DoPhysicsUpdateLogic() { /* Intentionally empty */ }
+    public override void ResetValues() { /* Reset internal SO state if needed */ }
+
+    // --- BASE CLASS METHODS (Ensure they are virtual in EnemyAttackSOBase) ---
+    // public override void Initialize(GameObject gameObject, Enemy enemy) { base.Initialize(gameObject, enemy); }
+    // public override void DoExitLogic() { base.DoExitLogic(); }
+    // public override void DoAnimationTriggerEventLogic(Enemy.AnimationTriggerType triggerType) { base.DoAnimationTriggerEventLogic(triggerType); }
 }

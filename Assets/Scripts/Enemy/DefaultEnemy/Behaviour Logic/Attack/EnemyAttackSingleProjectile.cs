@@ -56,9 +56,9 @@ public class EnemyAttackSingleProjectile : EnemyAttackSOBase
         // Additional logic for exiting attack state can be added here
     }
 
-    public override void DoPhysicsLogic()
+    public override void DoPhysicsUpdateLogic()
     {
-        base.DoPhysicsLogic();
+        base.DoPhysicsUpdateLogic();
         // Logic for physics updates during attack can be added here
     }
 

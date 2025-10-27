@@ -1,54 +1,40 @@
+// Full Path: Assets/Scripts/Enemy/DefaultEnemy/State Machine/ConcreteStates/EnemyChaseState.cs
 using UnityEngine;
 
 public class EnemyChaseState : EnemyState
 {
-   
-    public EnemyChaseState(Enemy enemy, EnemyStateMachine stateMachine) : base(enemy, stateMachine)
-    {
-      
-    }
+    public EnemyChaseState(Enemy enemy, EnemyStateMachine enemyStateMachine) : base(enemy, enemyStateMachine) { }
 
     public override void EnterState()
     {
         base.EnterState();
-       
-        enemy.EnemyChaseBaseInstance.DoEnterLogic();
-        // Additional logic for entering chase state can be added here
+        // Debug.Log($"{enemy.name} entering Chase State."); // Less spammy
+
+        if (enemy.agentMover != null) enemy.agentMover.canMove = true;
+
+        // --- Configure Steering Behaviours ---
+        if (enemy.seekBehaviour != null) enemy.seekBehaviour.enabled = true;
+        if (enemy.circleTargetBehaviour != null) enemy.circleTargetBehaviour.enabled = false;
+        if (enemy.obstacleAvoidanceBehaviour != null) enemy.obstacleAvoidanceBehaviour.enabled = true;
+        if (enemy.wallFollowingBehaviour != null) enemy.wallFollowingBehaviour.enabled = true; // <<<< ENABLED
+        // Disable any other specific movement behaviours here
     }
 
-    public override void ExitState()
-    {
-        base.ExitState();
-       
-        enemy.EnemyChaseBaseInstance.DoExitLogic();
-        // Additional logic for exiting chase state can be added here
-    }
+    public override void ExitState() { base.ExitState(); }
 
     public override void FrameUpdate()
     {
         base.FrameUpdate();
-        enemy.EnemyChaseBaseInstance.DoFrameUpdateLogic();
-         if (!enemy.IsAggroed)
-        {
-            stateMachine.ChangeState(enemy.IdleState);
+        // Check for transitions
+        if (!enemy.NeverReturnsToIdle && !enemy.IsAggroed) {
+            enemy.stateMachine.ChangeState(enemy.IdleState);
+            return;
         }
-        else if (enemy.IsWithInAttackDistance)
-        {
-            stateMachine.ChangeState(enemy.AttackState);
+        if (enemy.IsWithInAttackDistance) {
+            enemy.stateMachine.ChangeState(enemy.AttackState);
+            return;
         }
     }
 
-    public override void PhysicsUpdate()
-    {
-        base.PhysicsUpdate();
-        enemy.EnemyChaseBaseInstance.DoPhysicsLogic();
-        // Logic for physics updates during chase can be added here
-    }
-
-    public override void AnimationTriggerEvent(Enemy.AnimationTriggerType triggerType)
-    {
-        base.AnimationTriggerEvent(triggerType);
-        enemy.EnemyChaseBaseInstance.DoAnimationTriggerEventLogic(triggerType);
-        // Handle animation triggers specific to chase state
-    }
+    public override void PhysicsUpdate() { base.PhysicsUpdate(); }
 }

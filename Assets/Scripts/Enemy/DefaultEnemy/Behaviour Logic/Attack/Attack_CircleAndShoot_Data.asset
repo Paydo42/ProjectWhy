@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca1e19a5c227fc847af49fcd2ed11af5, type: 3}
+  m_Name: Attack_CircleAndShoot_Data
+  m_EditorClassIdentifier: 
+  bulletPrefab: {fileID: 5740292498457461232, guid: 10cb9fc61e2535b4ea18aac5d636410d, type: 3}
+  timeBetweenAttacks: 1
+  bulletSpeed: 10
+  circleSpeed: 4
+  preferredShootingRange: 5
+  rangeDeadZone: 1

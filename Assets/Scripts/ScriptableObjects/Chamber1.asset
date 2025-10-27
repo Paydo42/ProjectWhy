@@ -15,5 +15,3 @@ MonoBehaviour:
   enemiesToSpawn:
   - enemyPrefab: {fileID: 6750361400534454914, guid: 9d710cfa7bbde7d46b13c9f25cd57286, type: 3}
     position: {x: 0, y: -0.59}
-  - enemyPrefab: {fileID: 6750361400534454914, guid: 9d710cfa7bbde7d46b13c9f25cd57286, type: 3}
-    position: {x: 4.15, y: 0}
