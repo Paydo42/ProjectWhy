@@ -1,7 +1,9 @@
 // Full Path: Assets/Scripts/Enemy/DefaultEnemy/Base/Enemy.cs
 using UnityEngine;
 using System;
-using System.Collections.Generic; // Required for List if you use it later
+using System.Collections.Generic;
+using System.IO;
+using UnityEditor.PackageManager.Requests; // Required for List if you use it later
 
 public enum EnemyStartState
 {
@@ -30,6 +32,16 @@ public class Enemy : MonoBehaviour, IDamageable, IEnemyMoveable, ITriggerCheckAb
     private bool neverReturnsToIdle = false;
     // Public property to safely access the private neverReturnsToIdle field from other scripts (like states)
     public bool NeverReturnsToIdle => neverReturnsToIdle;
+
+    [Header("Pathfinding & Movement")]
+    [SerializeField, Tooltip("How often the enemy recalculates its path when actively pathfinding (seconds). Lower values are more responsive but cost more performance.")]  
+     private float pathUpdateInterval = 0.5f;
+     private float pathUpdateTimer = 0f;
+     private bool isPathfindingActive = false; // Flag to control periodic updates
+     public Vector3 currentPathfindingTarget; // Where are we trying to go?
+   // --- MODIFIED: Public getter, private setter. Set via Activate ---
+    public GridGenerator currentRoomGridGenerator { get; private set; }
+    // --- END MODIFICATION ---
 
     [Header("Combat Config")] // Header for combat-related settings
     [SerializeField, Tooltip("Layers that block this enemy's line of sight for shooting.")]
@@ -73,13 +85,14 @@ public class Enemy : MonoBehaviour, IDamageable, IEnemyMoveable, ITriggerCheckAb
     // --- AI Components (Context Steering) ---
     public AIData aiData { get; private set; }
     public AgentMover agentMover { get; private set; }
-    public SeekBehaviour seekBehaviour { get; private set; }
+  /*  public SeekBehaviour seekBehaviour { get; private set; }
     public CircleTargetBehaviour circleTargetBehaviour { get; private set; }
     public ObstacleAvoidanceBehaviour obstacleAvoidanceBehaviour { get; private set; }
     public WallFollowingBehaviour wallFollowingBehaviour { get; private set; } // <<<< ADDED REFERENCE
     // Add other behaviour references here as needed
-
+    */
     // --- Trigger Checks & Status Flags ---
+    public Transform playerTransform { get; private set; } // Store player ref here
     public ITriggerCheckAble AggroCheck { get; set; }
     public ITriggerCheckAble AttackDistanceCheck { get; set; }
     public bool IsFacingRight { get; set; } = true;
@@ -109,10 +122,15 @@ public class Enemy : MonoBehaviour, IDamageable, IEnemyMoveable, ITriggerCheckAb
         // Get AI Components
         aiData = GetComponent<AIData>();
         agentMover = GetComponent<AgentMover>();
-        seekBehaviour = GetComponent<SeekBehaviour>();
+        /* seekBehaviour = GetComponent<SeekBehaviour>();
         circleTargetBehaviour = GetComponent<CircleTargetBehaviour>();
         obstacleAvoidanceBehaviour = GetComponent<ObstacleAvoidanceBehaviour>();
         wallFollowingBehaviour = GetComponent<WallFollowingBehaviour>();
+        */
+        // Get Player Transform Reference
+        GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+        if (playerObj != null) playerTransform = playerObj.transform;
+        else Debug.LogError("Enemy Awake: No GameObject with tag 'Player' found in the scene.", this);
 
         // Fallback for avoidanceCollider
         if (avoidanceCollider == null)
@@ -155,10 +173,6 @@ public class Enemy : MonoBehaviour, IDamageable, IEnemyMoveable, ITriggerCheckAb
          // Validate essential AI components
          if(aiData == null) Debug.LogError($"'{gameObject.name}': Missing AIData component!", this);
          if(agentMover == null) Debug.LogError($"'{gameObject.name}': Missing AgentMover component!", this);
-         // SeekBehaviour is generally required if using Idle/Chase states
-         if(seekBehaviour == null && (startingState == EnemyStartState.StartIdle || startingState == EnemyStartState.StartChase))
-             Debug.LogWarning($"'{gameObject.name}': Missing SeekBehaviour, may not move correctly in Idle/Chase.", this);
-
     }
 
     public virtual void Update()
@@ -167,7 +181,16 @@ public class Enemy : MonoBehaviour, IDamageable, IEnemyMoveable, ITriggerCheckAb
 
         // Delegate state logic to the current state
         stateMachine.CurrentEnemyState?.FrameUpdate();
-
+        if (isPathfindingActive)
+        {
+            pathUpdateTimer += Time.deltaTime;
+            if (pathUpdateTimer >= pathUpdateInterval)
+            {
+                pathUpdateTimer = 0f;
+                // Recalculate path to current target
+                RequestPath(currentPathfindingTarget);
+            }
+        }
         // Basic animation update based on movement (can be expanded)
         UpdateAnimation();
     }
@@ -186,10 +209,22 @@ public class Enemy : MonoBehaviour, IDamageable, IEnemyMoveable, ITriggerCheckAb
         }
     }
 
-    public void Activate(RoomBounds room, GameObject prefab)
+    public void Activate(RoomBounds room, GameObject prefab , GridGenerator gridGenerator)
     {
         parentRoom = room;
         OriginalPrefab = prefab;
+
+        // --- Store the passed GridGenerator ---
+        this.currentRoomGridGenerator = gridGenerator;
+        if (this.currentRoomGridGenerator == null)
+        {
+            Debug.LogError($"Enemy '{name}' was activated without a valid GridGenerator!", this);
+            // Decide how to handle this - disable movement? Deactivate? Throw error?
+            // For now, it will just fail pathfinding requests.
+        }
+        // --- End Store GridGenerator ---
+        //Get grid generator for the room
+       
 
         // Set health from enemyData SO, with a fallback
         MaxHealth = enemyData != null ? enemyData.maxHealth : 10f; // Use 10 as default if SO missing
@@ -197,7 +232,7 @@ public class Enemy : MonoBehaviour, IDamageable, IEnemyMoveable, ITriggerCheckAb
 
         // Reset physics state before activating
         RB.linearVelocity = Vector2.zero;
-       
+
         GetComponent<Collider2D>().enabled = true;
 
         gameObject.SetActive(true);
@@ -227,18 +262,56 @@ public class Enemy : MonoBehaviour, IDamageable, IEnemyMoveable, ITriggerCheckAb
             default:
                 stateMachine.Initialize(IdleState);
                 Debug.Log($"'{name}' activated into Idle State.");
-                 // Ensure Aggro is reset if starting in Idle
+                // Ensure Aggro is reset if starting in Idle
                 SetAggroStatus(false);
                 break;
         }
         // Reset attack distance flag on activation
         SetAttackDistanceStatus(false);
+        StopPathfinding(); // Ensure pathfinding is off initially
     }
 
+    public void StartPathfinding(Vector3 targetPosition)
+    {
+        if (!isActivated || agentMover == null) return;
+
+        currentPathfindingTarget = targetPosition;
+        isPathfindingActive = true;
+        pathUpdateTimer = 0f; // Reset timer to trigger immediate path request
+        RequestPath(targetPosition);
+        agentMover.canMove = true; // Ensure movement is enabled
+    }
+    public void StopPathfinding()
+    {
+        if (agentMover == null) return; // Can happen during Awake/Deactivate
+        isPathfindingActive = false;
+        pathUpdateTimer = 0f;
+        agentMover.StopMovement(); // Safely stop movement if agentMover exists
+        agentMover.canMove = false;
+    }
+    public void RequestPath(Vector3 targetPosition)
+    {
+        if (isActivated && AStarManager.Instance != null && currentRoomGridGenerator != null && agentMover != null)
+        {
+            List<Node> newPath = AStarManager.Instance.FindPath(currentRoomGridGenerator, transform.position, targetPosition);
+            agentMover.SetPath(newPath); // Update the agentMover with the new path
+        }
+        else if (isActivated)
+        {
+            if (AStarManager.Instance == null) Debug.LogWarning($"[{name}] Cannot request path: AStarManager instance missing.");
+            else if (currentRoomGridGenerator == null) Debug.LogWarning($"[{name}] Cannot request path: GridGenerator missing.");
+            // else if(playerTransform == null) Debug.LogWarning($"[{name}] Cannot request path: Player Transform missing."); // Target isn't always player
+            else if (agentMover == null) Debug.LogWarning($"[{name}] Cannot request path: AgentMover missing.");
+
+            if (agentMover != null) agentMover.StopMovement();
+        }
+    }
+
+    
     public void Deactivate()
     {
         if(!isActivated) return; // Prevent double deactivation
-
+        StopPathfinding();
         Debug.Log($"'{name}' deactivated.");
         isActivated = false;
         RB.linearVelocity = Vector2.zero; // Stop movement immediately
@@ -250,11 +323,11 @@ public class Enemy : MonoBehaviour, IDamageable, IEnemyMoveable, ITriggerCheckAb
     public virtual void Die()
     {
         if (!isActivated) return; // Already dying or deactivated
-
+        StopPathfinding();
         Debug.Log($"'{name}' died.");
         isActivated = false;
         RB.linearVelocity = Vector2.zero;
-       GetComponent<Collider2D>().enabled = false; // Disable collider
+        GetComponent<Collider2D>().enabled = false; // Disable collider
 
         OnEnemyDeath?.Invoke(this); // Notify listeners
 

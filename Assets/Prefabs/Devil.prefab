@@ -207,14 +207,7 @@ GameObject:
   - component: {fileID: 9174222221256156721}
   - component: {fileID: 3432804763593945677}
   - component: {fileID: -3030607802617178811}
-  - component: {fileID: -2711726214924431489}
   - component: {fileID: -5099111900717330524}
-  - component: {fileID: -2355322631125702586}
-  - component: {fileID: 1193353864618302767}
-  - component: {fileID: 8942073666613372478}
-  - component: {fileID: 7832879341367710659}
-  - component: {fileID: -7477231402593192342}
-  - component: {fileID: -4527786960134252699}
   m_Layer: 6
   m_Name: Devil
   m_TagString: Enemy
@@ -406,12 +399,14 @@ MonoBehaviour:
   takeDamageTriggerName: IsTakingDamage
   startingState: 1
   neverReturnsToIdle: 1
+  pathUpdateInterval: 0.5
+  currentPathfindingTarget: {x: 0, y: 0, z: 0}
   lineOfSightMask:
     serializedVersion: 2
     m_Bits: 2048
   avoidanceCollider: {fileID: 0}
   EnemyIdleBaseInstance: {fileID: 0}
-  EnemyChaseBaseInstance: {fileID: 0}
+  EnemyChaseBaseInstance: {fileID: 11400000, guid: cfaee5ff0299f7044af0bcece295be06, type: 2}
   EnemyAttackBaseInstance: {fileID: 11400000, guid: 84ca0560c533a6a40a70f59c3973064c, type: 2}
   enemyData: {fileID: 11400000, guid: 3c3428bdfc3d56d4695d8ddf970d6414, type: 2}
 --- !u!114 &-3030607802617178811
@@ -429,19 +424,6 @@ MonoBehaviour:
   targets: []
   obstacles: []
   currentTarget: {fileID: 0}
---- !u!114 &-2711726214924431489
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6750361400534454914}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f01a90f6c1852354290445ed55ed900f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  showGizmos: 1
 --- !u!114 &-5099111900717330524
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -455,103 +437,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 3
+  waypointReachedDistance: 0.1
   canMove: 1
---- !u!114 &-2355322631125702586
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6750361400534454914}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 76865e702cc939e4da8a3d30777c0688, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1193353864618302767
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6750361400534454914}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 98d4fff2eea6fde4280943aa900cb6cd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  detectRadius: 5
-  obstacleLayer:
-    serializedVersion: 2
-    m_Bits: 2048
-  showGizmos: 1
---- !u!114 &8942073666613372478
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6750361400534454914}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: df88634f35f4a7e4f82d37deb00de398, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  targetReachedThreshold: 0.5
-  showGizmo: 1
---- !u!114 &7832879341367710659
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6750361400534454914}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a718ed61f3f740d40aba873d9c083727, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  radius: 1
-  agentColliderSize: 0.8
-  showGizmo: 1
---- !u!114 &-7477231402593192342
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6750361400534454914}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 39b54f8b7d4b0604a90fab9fbbbe3df0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  preferredShootingRange: 5
-  minimumDistance: 4
-  clockwise: 1
-  showGizmo: 1
---- !u!114 &-4527786960134252699
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6750361400534454914}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5c60657b0e8167f419b31cfdd949c387, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  wallCheckDistance: 1
-  sideFeelerDistance: 0.8
-  sideFeelerAngle: 45
-  wallLayerMask:
-    serializedVersion: 2
-    m_Bits: 2048
-  followStrength: 0.9
-  wallDistance: 0.8
-  wallAvoidanceStrength: 0.7
-  showGizmo: 1
+  isFollowingPath: 0
 --- !u!1 &8652582045148003831
 GameObject:
   m_ObjectHideFlags: 0
