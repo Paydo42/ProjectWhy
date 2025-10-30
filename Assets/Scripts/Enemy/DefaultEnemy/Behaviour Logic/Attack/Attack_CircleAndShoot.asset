@@ -12,13 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca1e19a5c227fc847af49fcd2ed11af5, type: 3}
   m_Name: Attack_CircleAndShoot
   m_EditorClassIdentifier: 
+  preferredShootingRange: 5
   bulletPrefab: {fileID: 5740292498457461232, guid: 10cb9fc61e2535b4ea18aac5d636410d, type: 3}
   timeBetweenAttacks: 1
   bulletSpeed: 5
-  circleSpeed: 4
-  preferredShootingRange: 5
-  rangeDeadZone: 1
-  obstacleLayerMask:
-    serializedVersion: 2
-    m_Bits: 2112
-  obstacleCheckDistance: 1.5
+  minimumDistance: 4
+  minCircleSwitchInterval: 5
+  maxCircleSwitchInterval: 10
+  circlePathUpdateInterval: 0.3

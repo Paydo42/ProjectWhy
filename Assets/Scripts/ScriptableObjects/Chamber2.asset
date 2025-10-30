@@ -13,9 +13,5 @@ MonoBehaviour:
   m_Name: Chamber2
   m_EditorClassIdentifier: Assembly-CSharp::RoomLayout
   enemiesToSpawn:
-  - enemyPrefab: {fileID: 6750361400534454914, guid: 1fc9a57426462f549ba0adb97f0f0742, type: 3}
+  - enemyPrefab: {fileID: 6750361400534454914, guid: 9d710cfa7bbde7d46b13c9f25cd57286, type: 3}
     position: {x: -3, y: 0}
-  - enemyPrefab: {fileID: 6750361400534454914, guid: 1fc9a57426462f549ba0adb97f0f0742, type: 3}
-    position: {x: 0, y: 0}
-  - enemyPrefab: {fileID: 7466799111149717774, guid: 9a2483f5ea64d6a48976ca64796ac1d6, type: 3}
-    position: {x: 3, y: 0}

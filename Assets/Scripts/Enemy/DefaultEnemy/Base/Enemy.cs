@@ -107,12 +107,7 @@ public class Enemy : MonoBehaviour, IDamageable, IEnemyMoveable, ITriggerCheckAb
 
     public virtual void Awake()
     {
-        // Initialize State Machine & States
-        stateMachine = new EnemyStateMachine();
-        IdleState = new EnemyIdleState(this, stateMachine);
-        ChaseState = new EnemyChaseState(this, stateMachine);
-        AttackState = new EnemyAttackState(this, stateMachine);
-
+ 
         // Get Core Components
         animator = GetComponentInChildren<Animator>();
         RB = GetComponent<Rigidbody2D>();
@@ -131,6 +126,31 @@ public class Enemy : MonoBehaviour, IDamageable, IEnemyMoveable, ITriggerCheckAb
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
         if (playerObj != null) playerTransform = playerObj.transform;
         else Debug.LogError("Enemy Awake: No GameObject with tag 'Player' found in the scene.", this);
+
+
+         // Instantiate and Initialize Scriptable Object Instances (primarily for Attack Data now)
+        if (EnemyIdleBaseInstance != null)
+        {
+            EnemyIdleBaseInstance = Instantiate(EnemyIdleBaseInstance);
+            EnemyIdleBaseInstance.Initialize(gameObject, this);
+        }
+        if (EnemyChaseBaseInstance != null)
+        {
+            EnemyChaseBaseInstance = Instantiate(EnemyChaseBaseInstance);
+            EnemyChaseBaseInstance.Initialize(gameObject, this);
+        }
+         if (EnemyAttackBaseInstance != null)
+        {
+            EnemyAttackBaseInstance = Instantiate(EnemyAttackBaseInstance);
+            EnemyAttackBaseInstance.Initialize(gameObject, this);
+        } else {
+             Debug.LogError($"'{gameObject.name}': Missing required Enemy Attack Base Instance ScriptableObject assignment!", this);
+        }
+               // Initialize State Machine & States
+        stateMachine = new EnemyStateMachine();
+        IdleState = new EnemyIdleState(this, stateMachine);
+        ChaseState = new EnemyChaseState(this, stateMachine);
+        AttackState = new EnemyAttackState(this, stateMachine);
 
         // Fallback for avoidanceCollider
         if (avoidanceCollider == null)
@@ -151,27 +171,9 @@ public class Enemy : MonoBehaviour, IDamageable, IEnemyMoveable, ITriggerCheckAb
             Debug.LogError($"'{gameObject.name}': Missing 'EnemyAttacktingDistanceCheck' component/script.", this);
         }
 
-        // Instantiate and Initialize Scriptable Object Instances (primarily for Attack Data now)
-        if (EnemyIdleBaseInstance != null)
-        {
-            EnemyIdleBaseInstance = Instantiate(EnemyIdleBaseInstance);
-            EnemyIdleBaseInstance.Initialize(gameObject, this);
-        }
-        if (EnemyChaseBaseInstance != null)
-        {
-            EnemyChaseBaseInstance = Instantiate(EnemyChaseBaseInstance);
-            EnemyChaseBaseInstance.Initialize(gameObject, this);
-        }
-         if (EnemyAttackBaseInstance != null)
-        {
-            EnemyAttackBaseInstance = Instantiate(EnemyAttackBaseInstance);
-            EnemyAttackBaseInstance.Initialize(gameObject, this);
-        } else {
-             Debug.LogError($"'{gameObject.name}': Missing required Enemy Attack Base Instance ScriptableObject assignment!", this);
-        }
-
+       
          // Validate essential AI components
-         if(aiData == null) Debug.LogError($"'{gameObject.name}': Missing AIData component!", this);
+       //  if(aiData == null) Debug.LogError($"'{gameObject.name}': Missing AIData component!", this);
          if(agentMover == null) Debug.LogError($"'{gameObject.name}': Missing AgentMover component!", this);
     }
 
@@ -237,7 +239,8 @@ public class Enemy : MonoBehaviour, IDamageable, IEnemyMoveable, ITriggerCheckAb
 
         gameObject.SetActive(true);
         isActivated = true;
-
+          StopPathfinding(); // Ensure pathfinding is off initially
+        Debug.Log($" Pathfinding stopped on activation for '{name}'."); 
 
         // Reset Animator
         if (animator != null)
@@ -268,7 +271,7 @@ public class Enemy : MonoBehaviour, IDamageable, IEnemyMoveable, ITriggerCheckAb
         }
         // Reset attack distance flag on activation
         SetAttackDistanceStatus(false);
-        StopPathfinding(); // Ensure pathfinding is off initially
+      
     }
 
     public void StartPathfinding(Vector3 targetPosition)
@@ -288,6 +291,7 @@ public class Enemy : MonoBehaviour, IDamageable, IEnemyMoveable, ITriggerCheckAb
         pathUpdateTimer = 0f;
         agentMover.StopMovement(); // Safely stop movement if agentMover exists
         agentMover.canMove = false;
+        Debug.Log($"'{name}' stopped pathfinding.");
     }
     public void RequestPath(Vector3 targetPosition)
     {

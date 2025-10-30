@@ -206,7 +206,6 @@ GameObject:
   - component: {fileID: 1248914072329239807}
   - component: {fileID: 9174222221256156721}
   - component: {fileID: 3432804763593945677}
-  - component: {fileID: -3030607802617178811}
   - component: {fileID: -5099111900717330524}
   m_Layer: 6
   m_Name: Devil
@@ -407,23 +406,8 @@ MonoBehaviour:
   avoidanceCollider: {fileID: 0}
   EnemyIdleBaseInstance: {fileID: 0}
   EnemyChaseBaseInstance: {fileID: 11400000, guid: cfaee5ff0299f7044af0bcece295be06, type: 2}
-  EnemyAttackBaseInstance: {fileID: 11400000, guid: 84ca0560c533a6a40a70f59c3973064c, type: 2}
+  EnemyAttackBaseInstance: {fileID: 11400000, guid: 0f85419c44aedfb44b0c6d4d299d0896, type: 2}
   enemyData: {fileID: 11400000, guid: 3c3428bdfc3d56d4695d8ddf970d6414, type: 2}
---- !u!114 &-3030607802617178811
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6750361400534454914}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d11c6986dd0c2174aaa10a79d9dfca06, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  targets: []
-  obstacles: []
-  currentTarget: {fileID: 0}
 --- !u!114 &-5099111900717330524
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -438,6 +422,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 3
   waypointReachedDistance: 0.1
+  turnSpeed: 10
+  avoidanceLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  avoidanceRadius: 1
+  avoidanceWeight: 2
   canMove: 1
   isFollowingPath: 0
 --- !u!1 &8652582045148003831

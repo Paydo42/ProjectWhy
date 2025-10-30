@@ -11,10 +11,19 @@ public class EnemyAttackCircleAndShoot : EnemyAttackSOBase
     public float bulletSpeed = 10f;       // Used here for PerformShoot
 
     [Header("Circling Config")]
-    public float preferredShootingRange = 5f; // Used here for movement calculation AND by State for transitions
+    // --- THIS IS THE FIX ---
+    // REMOVE the 'preferredShootingRange' line from here.
+    // It is inherited from EnemyAttackSOBase and you set its value (e.g., to 5)
+    // on the "Attack_CircleAndShoot_Data.asset" file in the Unity Inspector.
+    // --- END FIX ---
     public float minimumDistance = 4f;        // Minimum distance to maintain
-    public float circleSwitchInterval = 5.0f; // How often to switch circling direction
+    [Tooltip("Minimum time (seconds) to circle in one direction.")]
+    public float minCircleSwitchInterval = 5.0f; 
+    [Tooltip("Maximum time (seconds) to circle in one direction.")]
+    public float maxCircleSwitchInterval = 10.0f;
+
     [Tooltip("How frequently to recalculate the next point on the circle (seconds).")]
+
     public float circlePathUpdateInterval = 0.2f;
 
     // Runtime variables
@@ -23,7 +32,7 @@ public class EnemyAttackCircleAndShoot : EnemyAttackSOBase
     private float circlePathUpdateTimer = 0f;
     private float shootTimer = 0f; // <<< ADDED shooting timer here
     // No need to store GridGenerator ref, access via enemy.currentRoomGridGenerator
-
+    private float _currentCircleSwitchInterval;
     // Initialize is handled by base class
     // public override void Initialize(GameObject ownerGameObject, Enemy ownerEnemy) { base.Initialize(ownerGameObject, ownerEnemy); }
 
@@ -35,17 +44,32 @@ public class EnemyAttackCircleAndShoot : EnemyAttackSOBase
         circlePathUpdateTimer = circlePathUpdateInterval; // Trigger immediate update
         shootTimer = 0f; // <<< Reset shoot timer on enter
 
+        // Randomize initial circle switch interval
+        _currentCircleSwitchInterval = Random.Range(minCircleSwitchInterval, maxCircleSwitchInterval);
         enemy?.StopPathfinding();
+        Debug.Log($"Stopping existing pathfinding for circling logic.");
         if (enemy?.agentMover != null) enemy.agentMover.canMove = true;
 
         // Request first path
-        if (playerTransform != null && enemy?.currentRoomGridGenerator != null) {
+       if (enemy.playerTransform != null && enemy.currentRoomGridGenerator != null)
+        {
             CalculateAndRequestCirclePath();
-        } else { /* Error Logging */ }
+            Debug.Log($"[{enemy.name}] CircleAndShoot SO: Initial circling path requested.");
+        }
+        else
+        { 
+            /* Error Logging */ 
+            // Updated error message to be more specific
+            Debug.LogError($"[{enemy?.name}] CircleAndShoot SO: Missing enemy.playerTransform or enemy.currentRoomGridGenerator on enter.");
+        }
+
     }
 
     // Public getter for external logic if needed
-    public int GetCircleDirection() { return (int)_internalCircleDirection; }
+    public int GetCircleDirection()
+     {
+        return (int)_internalCircleDirection;
+    }
 
     // Called every frame by EnemyAttackState's FrameUpdate
     public override void DoFrameUpdateLogic()
@@ -56,9 +80,11 @@ public class EnemyAttackCircleAndShoot : EnemyAttackSOBase
 
         // --- Circle Direction Switching ---
         circleDirectionTimer += Time.deltaTime;
-        if (circleDirectionTimer >= circleSwitchInterval) {
+        if (circleDirectionTimer >= _currentCircleSwitchInterval) 
+        {
             circleDirectionTimer = 0f;
             _internalCircleDirection *= -1;
+            _currentCircleSwitchInterval = Random.Range(minCircleSwitchInterval, maxCircleSwitchInterval);
         }
 
         // --- Pathfinding Update Timer ---
@@ -66,6 +92,7 @@ public class EnemyAttackCircleAndShoot : EnemyAttackSOBase
         if (circlePathUpdateTimer >= circlePathUpdateInterval) {
             circlePathUpdateTimer = 0f;
             CalculateAndRequestCirclePath();
+            Debug.Log($"[{enemy.name}] CircleAndShoot SO: Updated circling path.");
         }
 
         // --- MOVED: Shooting Logic ---
@@ -91,6 +118,7 @@ public class EnemyAttackCircleAndShoot : EnemyAttackSOBase
         float currentDistance = directionToPlayer.magnitude;
         if (currentDistance < 0.01f) currentDistance = 0.01f;
 
+        // This line now works because 'preferredShootingRange' is inherited
         Vector3 desiredPosition = playerTransform.position - directionToPlayer.normalized * preferredShootingRange;
         Vector3 tangentDirection = Vector3.Cross(directionToPlayer.normalized, Vector3.forward);
         tangentDirection *= _internalCircleDirection;
@@ -105,16 +133,25 @@ public class EnemyAttackCircleAndShoot : EnemyAttackSOBase
 
         Node targetNode = enemy.currentRoomGridGenerator.GetNodeFromWorldPoint(circleTargetPoint);
 
-        if (targetNode != null && !targetNode.isObstacle) {
+        if (targetNode != null && !targetNode.isObstacle)
+        {
             enemy.RequestPath(targetNode.transform.position);
+            Debug.Log($"[{enemy.name}] CircleAndShoot SO: Requested path to circling point at {targetNode.transform.position}.");
             if (enemy.agentMover != null) enemy.agentMover.canMove = true;
-        } else {
+        }
+        else
+        {
             Node fallbackNode = enemy.currentRoomGridGenerator.GetNodeFromWorldPoint(desiredPosition);
-            if (fallbackNode != null && !fallbackNode.isObstacle) {
+            if (fallbackNode != null && !fallbackNode.isObstacle)
+            {
                 enemy.RequestPath(fallbackNode.transform.position);
-                 if (enemy.agentMover != null) enemy.agentMover.canMove = true;
-            } else {
+                if (enemy.agentMover != null) enemy.agentMover.canMove = true;
+                Debug.LogWarning($"[{enemy.name}] CircleAndShoot SO: Fallback to desired position node for circling path.");
+            }
+            else
+            {
                 enemy.StopPathfinding();
+                Debug.LogWarning($"[{enemy.name}] CircleAndShoot SO: No valid node found for circling path.");
             }
         }
     }
@@ -138,8 +175,8 @@ public class EnemyAttackCircleAndShoot : EnemyAttackSOBase
     {
         // Use fields directly from this SO instance (bulletPrefab, bulletSpeed)
         if (bulletPrefab == null || playerTransform == null || PoolManager.Instance == null || enemy == null) {
-             Debug.LogError($"[{enemy?.name}] PerformShoot in SO missing refs: Bullet:{bulletPrefab!=null}, Player:{playerTransform!=null}, Pool:{PoolManager.Instance!=null}");
-             return;
+            Debug.LogError($"[{enemy?.name}] PerformShoot in SO missing refs: Bullet:{bulletPrefab!=null}, Player:{playerTransform!=null}, Pool:{PoolManager.Instance!=null}");
+            return;
         }
 
         Vector2 directionToPlayer = (playerTransform.position - transform.position).normalized;
@@ -150,7 +187,7 @@ public class EnemyAttackCircleAndShoot : EnemyAttackSOBase
         {
             bullet.Initialize(bulletPrefab);
             bullet.SetDirection(directionToPlayer, bulletSpeed); // Use bulletSpeed from this SO
-             // Debug.Log($"[{enemy.name}] Fired projectile from SO!");
+            // Debug.Log($"[{enemy.name}] Fired projectile from SO!");
         }
         else { Debug.LogError($"Bullet prefab '{bulletPrefab.name}' missing EnemyProjectile script!", bulletPrefab); }
     }

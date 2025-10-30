@@ -17,10 +17,12 @@ public class EnemyChaseState : EnemyState
         if (playerTransform != null)
         {
             enemy.StartPathfinding(playerTransform.position); // Start periodic path updates towards player
+            Debug.Log($"{enemy.name} started pathfinding towards player at {playerTransform.position}.");
         }
         else
         {
             enemy.StopPathfinding(); // Stop if we can't find player
+            Debug.LogWarning($"{enemy.name} cannot start pathfinding: Player Transform is null.");
         }
         /*/ --- Configure Steering Behaviours ---
         if (enemy.seekBehaviour != null) enemy.seekBehaviour.enabled = true;
@@ -48,6 +50,7 @@ public class EnemyChaseState : EnemyState
                 enemy.StopPathfinding(); // Stop if player is gone
                                          // Decide what state to go to - maybe Idle?
                 if (!enemy.NeverReturnsToIdle) enemy.stateMachine.ChangeState(enemy.IdleState);
+                Debug.Log($"ChaseState ({enemy.name}): Changing to Idle State due to lost player.");
                 return;
             }
         }
@@ -56,11 +59,13 @@ public class EnemyChaseState : EnemyState
         if (!enemy.NeverReturnsToIdle && !enemy.IsAggroed) 
         {
             enemy.stateMachine.ChangeState(enemy.IdleState);
+            Debug.Log($"ChaseState ({enemy.name}): Lost aggro, changing to Idle State.");
             return;
         }
         if (enemy.IsWithInAttackDistance)
          {
             enemy.stateMachine.ChangeState(enemy.AttackState);
+            Debug.Log($"ChaseState ({enemy.name}): Within attack distance, changing to Attack State.");
             return;
         }
     }

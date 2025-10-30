@@ -26,6 +26,7 @@ public class EnemyAttackState : EnemyState
 
         // Tell the SO to initialize its logic (movement AND shooting timers)
         attackDataSO?.DoEnterLogic();
+        Debug.Log($"{enemy.name} entered Attack State using {attackDataSO?.name}.");
     }
 
     public override void ExitState()

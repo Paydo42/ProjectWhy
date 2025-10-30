@@ -14,4 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RoomLayout
   enemiesToSpawn:
   - enemyPrefab: {fileID: 6750361400534454914, guid: 9d710cfa7bbde7d46b13c9f25cd57286, type: 3}
-    position: {x: 0, y: -0.59}
+    position: {x: 0, y: 0.5}
+  - enemyPrefab: {fileID: 6750361400534454914, guid: 9d710cfa7bbde7d46b13c9f25cd57286, type: 3}
+    position: {x: 0, y: 1}

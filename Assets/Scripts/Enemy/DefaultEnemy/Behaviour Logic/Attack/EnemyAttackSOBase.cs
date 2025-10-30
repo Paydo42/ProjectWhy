@@ -7,6 +7,7 @@ using UnityEngine;
 public class EnemyAttackSOBase : ScriptableObject
 {
     // References set during initialization by the Enemy script
+    [SerializeField] public float preferredShootingRange = 7f;
     protected Enemy enemy;
     protected Transform transform;
     protected GameObject gameObject;
@@ -19,15 +20,13 @@ public class EnemyAttackSOBase : ScriptableObject
         this.gameObject = ownerGameObject;
         this.transform = ownerGameObject.transform;
         this.enemy = ownerEnemy;
-
-        // Find the player transform safely
-        GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
-        if (playerObj != null)
-        {
-            playerTransform = playerObj.transform;
-        } else {
-            Debug.LogError($"EnemyAttackSOBase on {ownerEnemy.name} could not find GameObject with tag 'Player' during Initialize.", ownerEnemy);
+        this.playerTransform = ownerEnemy.playerTransform;
+        if (this.playerTransform == null)
+         {
+            Debug.LogError($"EnemyAttackSOBase on {ownerEnemy.name} received a null 'playerTransform' from the Enemy script!", ownerEnemy);
         }
+        // Find the player transform safely
+
     }
 
     // Called once by the corresponding EnemyState (e.g., EnemyAttackState) when entering the state.

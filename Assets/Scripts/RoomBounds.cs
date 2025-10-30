@@ -7,7 +7,7 @@ public class RoomBounds : MonoBehaviour
     [Header("Enemy Spawning")]
     public RoomLayout roomLayout; // Assign your layout file here in the Inspector!
     private List<Enemy> activeEnemies = new List<Enemy>(); // List to track spawned enemies
-
+    private GridGenerator roomGridGenerator;
     [Header("Camera Settings")]
     private BoxCollider2D BoxCollider; // Renamed from 'box'
 
@@ -35,6 +35,11 @@ public class RoomBounds : MonoBehaviour
         BoxCollider.isTrigger = true;
         cameraController = Camera.main.GetComponent<BoiCameraController>();
 
+        roomGridGenerator = GetComponentInChildren<GridGenerator>();
+        if (roomGridGenerator == null)
+        {
+            Debug.LogError($"RoomBounds '{gameObject.name}' is missing its GridGenerator component!", this);
+        }
         // We no longer find pre-placed enemies here
     }
 
@@ -100,7 +105,12 @@ public class RoomBounds : MonoBehaviour
             if (roomDoors.Count > 0) UnlockDoors(); // Unlock doors immediately
             return;
         }
-
+        if (roomGridGenerator == null)
+        {
+            Debug.LogError($"Cannot spawn enemies in {gameObject.name}: RoomGridGenerator is missing.", this);
+            UnlockDoors();
+            return;
+        }
         foreach (var placement in roomLayout.enemiesToSpawn)
         {
             if (placement.enemyPrefab == null) continue;
@@ -115,14 +125,15 @@ public class RoomBounds : MonoBehaviour
             if (enemy != null)
             {
                 activeEnemies.Add(enemy);
-                enemy.Activate(this, placement.enemyPrefab); // Activate the enemy's AI
-                enemy.OnEnemyDeath += HandleEnemyDeath; // Subscribe to its death event
+                enemy.Activate(this, placement.enemyPrefab, roomGridGenerator); // Activate the enemy's AI
+
+                enemy.OnEnemyDeath += HandleEnemyDeath;
             }
             else
             {
                 Debug.LogError($"Prefab {placement.enemyPrefab.name} does not have an Enemy component!");
                 // Return the object to pool if it's not a valid enemy
-                 PoolManager.Instance.ReturnToPool(enemyObj, placement.enemyPrefab);
+                PoolManager.Instance.ReturnToPool(enemyObj, placement.enemyPrefab);
             }
         }
 
