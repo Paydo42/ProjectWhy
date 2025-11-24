@@ -83,7 +83,7 @@ public class EnemyAttackCircleAndShoot : EnemyAttackSOBase
         if (circleDirectionTimer >= _currentCircleSwitchInterval) 
         {
             circleDirectionTimer = 0f;
-            _internalCircleDirection *= -1;
+            _internalCircleDirection *= -1; 
             _currentCircleSwitchInterval = Random.Range(minCircleSwitchInterval, maxCircleSwitchInterval);
         }
 

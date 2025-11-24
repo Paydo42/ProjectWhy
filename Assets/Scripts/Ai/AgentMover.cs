@@ -8,7 +8,7 @@ public class AgentMover : MonoBehaviour
 {
     // ... (all variables and Awake method are correct) ...
     private Rigidbody2D rb;
-
+    private SpriteRenderer spriteRenderer;
     [Header("Pathfinding")]
     [SerializeField]
     public float moveSpeed = 3f;
@@ -38,7 +38,7 @@ public class AgentMover : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-
+        spriteRenderer = GetComponent<SpriteRenderer>();
         if (rb == null) {
             Debug.LogError($"AgentMover on {gameObject.name} requires a Rigidbody2D!", this);
         } else {
@@ -106,7 +106,11 @@ public class AgentMover : MonoBehaviour
             Vector2 avoidanceDirection = CalculateAvoidance();
             
             Vector2 moveDirection = (pathDirection + (avoidanceDirection * avoidanceWeight)).normalized;
-
+            if (spriteRenderer != null && Mathf.Abs(moveDirection.x) > 0.1f)
+            {
+                // flipX is true when facing LEFT, false when facing RIGHT
+                spriteRenderer.flipX = moveDirection.x < 0;
+            }
             Vector2 targetVelocity = moveDirection * moveSpeed;
 
             rb.linearVelocity = Vector2.Lerp(
@@ -136,7 +140,7 @@ public class AgentMover : MonoBehaviour
     {
         Vector2 avoidanceVector = Vector2.zero;
         int hitCount = Physics2D.OverlapCircle(rb.position, avoidanceRadius, avoidanceFilter, avoidanceBuffer);
-
+        
         if (hitCount > 0)
         {
             for (int i = 0; i < hitCount; i++)
@@ -147,9 +151,10 @@ public class AgentMover : MonoBehaviour
 
                 Vector2 awayFromOther = rb.position - (Vector2)other.transform.position;
                 
-                float weight = 1.0f / (awayFromOther.magnitude + 0.01f); 
-                
+                float weight = 1.0f / (awayFromOther.magnitude + 0.01f);
+
                 avoidanceVector += awayFromOther.normalized * weight;
+                Debug.DrawRay(rb.position, awayFromOther.normalized * weight, Color.yellow);
             }
             
             if (avoidanceVector != Vector2.zero)

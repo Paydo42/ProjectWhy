@@ -407,9 +407,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 8
   currentHealth: 0
-  fullHeart: {fileID: -5602279809399323471, guid: ecbe3c3ea67a29f49b8f3dfb53776bb2, type: 3}
-  halfHeart: {fileID: -7363085735459886553, guid: ecbe3c3ea67a29f49b8f3dfb53776bb2, type: 3}
-  emptyHeart: {fileID: 7435772165600834056, guid: ecbe3c3ea67a29f49b8f3dfb53776bb2, type: 3}
+  fullHeart: {fileID: 5800323473991117985, guid: 7603ea12cfb8ec34fb6028731e91a5f2, type: 3}
+  halfHeart: {fileID: -5722079721010559, guid: 47ed6c237cc3f45469193becb4e83956, type: 3}
+  emptyHeart: {fileID: 8306992596269193588, guid: 62136eb9d04ccec439895c3d35a6e49e, type: 3}
   healthUiManager: {fileID: 0}
   damageCooldown: 0.2
   invulnerabilityFlashRate: 0.1

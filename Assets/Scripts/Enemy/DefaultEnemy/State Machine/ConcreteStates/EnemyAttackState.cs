@@ -59,8 +59,9 @@ public class EnemyAttackState : EnemyState
 
         if (distanceToPlayerSqr > bufferedRangeSqr)
         {
-            // Debug.Log($"AttackState ({enemy.name}): Player out of buffered range (Dist^2 {distanceToPlayerSqr:F2} > Buffered^2 {bufferedRangeSqr:F2}), changing to Chase State.");
+             Debug.Log($"AttackState ({enemy.name}): Player out of buffered range (Dist^2 {distanceToPlayerSqr:F2} > Buffered^2 {bufferedRangeSqr:F2}), changing to Chase State.");
             enemy.stateMachine.ChangeState(enemy.ChaseState);
+            
             return; // Exit early if transitioning
         }
         // --- End Transitions ---

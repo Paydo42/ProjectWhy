@@ -3,7 +3,7 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using UnityEditor.PackageManager.Requests; // Required for List if you use it later
+
 
 public enum EnemyStartState
 {
@@ -204,11 +204,12 @@ public class Enemy : MonoBehaviour, IDamageable, IEnemyMoveable, ITriggerCheckAb
         // Delegate physics logic (if any) to the current state
         stateMachine.CurrentEnemyState?.PhysicsUpdate();
 
-        // Update facing direction based on current linearVelocity
+        /*/ Update facing direction based on current linearVelocity
         if (RB.linearVelocity.sqrMagnitude > 0.01f)
         {
             CheckForLeftOrRightFacing(RB.linearVelocity);
         }
+        */
     }
 
     public void Activate(RoomBounds room, GameObject prefab , GridGenerator gridGenerator)

@@ -9,9 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: 72d2417a9873c9f43b2b7174439fa7a7, type: 3}
   m_Name: Chamber2
-  m_EditorClassIdentifier: Assembly-CSharp::RoomLayout
+  m_EditorClassIdentifier: 
   enemiesToSpawn:
   - enemyPrefab: {fileID: 6750361400534454914, guid: 9d710cfa7bbde7d46b13c9f25cd57286, type: 3}
-    position: {x: -3, y: 0}
+    position: {x: 0, y: 0}
+  - enemyPrefab: {fileID: 6750361400534454914, guid: 9d710cfa7bbde7d46b13c9f25cd57286, type: 3}
+    position: {x: 6, y: 7}

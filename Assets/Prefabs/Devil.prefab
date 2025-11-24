@@ -421,7 +421,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 3
-  waypointReachedDistance: 0.1
+  waypointReachedDistance: 0.5
   turnSpeed: 10
   avoidanceLayer:
     serializedVersion: 2

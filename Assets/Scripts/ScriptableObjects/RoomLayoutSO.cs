@@ -11,7 +11,7 @@ public struct EnemyPlacement
 
 // This makes a new option in the "Create" menu to create these layout files
 [CreateAssetMenu(fileName = "New Room Layout", menuName = "Dungeon/Room Layout")]
-public class RoomLayout : ScriptableObject
+public class RoomLayoutSO : ScriptableObject
 {
     // A list of all enemies to spawn for this specific room layout
     public List<EnemyPlacement> enemiesToSpawn;

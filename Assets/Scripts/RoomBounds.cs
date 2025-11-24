@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class RoomBounds : MonoBehaviour
 {
     [Header("Enemy Spawning")]
-    public RoomLayout roomLayout; // Assign your layout file here in the Inspector!
+    public RoomLayoutSO roomLayout; // Assign your layout file here in the Inspector!
     private List<Enemy> activeEnemies = new List<Enemy>(); // List to track spawned enemies
     private GridGenerator roomGridGenerator;
     [Header("Camera Settings")]
