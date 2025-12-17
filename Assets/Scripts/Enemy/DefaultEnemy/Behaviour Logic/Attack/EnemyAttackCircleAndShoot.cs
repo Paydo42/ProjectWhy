@@ -1,6 +1,6 @@
 // Full Path: Assets/Scripts/Enemy/DefaultEnemy/Behaviour Logic/Attack/EnemyAttackCircleAndShoot.cs
 using UnityEngine;
-using System.Collections.Generic; // Keep if PoolManager might need it later
+using System.Collections.Generic;
 
 [CreateAssetMenu(fileName = "Attack_CircleAndShoot_Data", menuName = "Enemy Logic/Attack Logic Data/Circle and Shoot Data")]
 public class EnemyAttackCircleAndShoot : EnemyAttackSOBase
@@ -123,7 +123,65 @@ public class EnemyAttackCircleAndShoot : EnemyAttackSOBase
         Vector3 tangentDirection = Vector3.Cross(directionToPlayer.normalized, Vector3.forward);
         tangentDirection *= _internalCircleDirection;
 
-        float lookAheadDistance = (enemy.agentMover != null ? enemy.agentMover.moveSpeed : 3f) * circlePathUpdateInterval * 1.5f;
+        Node startNode = enemy.currentRoomGridGenerator.GetNodeFromWorldPoint(transform.position);
+
+        float [] lookAheadMultipliers = new float [] {3.5f, 2.0f , 1.0f};
+        Node bestTargetNode = null;
+        foreach (float multiplier in lookAheadMultipliers)
+        {
+            float checkDistance = (enemy.agentMover != null ? enemy.agentMover.moveSpeed : 3f) * circlePathUpdateInterval * multiplier;
+            Debug.DrawRay(transform.position, tangentDirection * checkDistance, Color.cyan, 0.1f); // Visualize check direction
+            Debug.Log($"[{enemy.name}] CircleAndShoot SO: Checking circle target at distance {checkDistance} (multiplier {multiplier}).");
+            Vector3 potentialTarget = desiredPosition + tangentDirection * checkDistance;
+
+            // Apply "Push Away" logic to the potential point
+            if (currentDistance < minimumDistance)
+            {
+                Vector3 pushAway = (transform.position - playerTransform.position).normalized * (minimumDistance - currentDistance);
+                potentialTarget += pushAway * 0.5f;
+            }
+            //Check 1
+            Node destNode = enemy.currentRoomGridGenerator.GetNodeFromWorldPoint(potentialTarget);
+            
+            // Check if node exists, is walkable, and is NOT occupied by another enemy (High Penalty)
+            if (destNode == null || destNode.isObstacle || destNode.movementPenalty > 10) 
+            {
+                continue; // Destination is bad, try a shorter jump
+            }
+            //Check 2
+            Vector3 midPoint =  Vector3.Lerp(transform.position, potentialTarget, 0.5f);
+            Node midNode = enemy.currentRoomGridGenerator.GetNodeFromWorldPoint(midPoint);
+            if (midNode == null || midNode.isObstacle || midNode.movementPenalty > 10) 
+            {
+                continue; // Midpoint is bad, try a shorter jump
+            }
+            // If both checks passed, select this node
+            bestTargetNode = destNode;
+            break;
+        }
+
+        // 3. Execution
+        
+
+        if (bestTargetNode != null)
+        {
+            enemy.RequestPath(bestTargetNode.transform.position);
+            if (enemy.agentMover != null) enemy.agentMover.canMove = true;
+        }
+        else
+        {
+            // All forward spots are blocked by walls or enemies.
+            // Fallback: Just try to get to the 'perfect circle' spot (0 lookahead) to maintain range.
+            Node fallbackNode = enemy.currentRoomGridGenerator.GetNodeFromWorldPoint(desiredPosition);
+            if (fallbackNode != null && !fallbackNode.isObstacle)
+            {
+                enemy.RequestPath(fallbackNode.transform.position);
+            }
+        }
+    
+        // --- SMOOTHNESS FIX: Calculate a longer look-ahead distance for smoother paths ---
+        // Instead of looking ahead just 1.5x the move speed, we look further to get a multi-node path
+        /*float lookAheadDistance = (enemy.agentMover != null ? enemy.agentMover.moveSpeed : 3f) * circlePathUpdateInterval * 3.5f; // Increased from 1.5f to 3.5f
         Vector3 circleTargetPoint = desiredPosition + tangentDirection * lookAheadDistance;
 
         if(currentDistance < minimumDistance) {
@@ -136,7 +194,7 @@ public class EnemyAttackCircleAndShoot : EnemyAttackSOBase
         if (targetNode != null && !targetNode.isObstacle)
         {
             enemy.RequestPath(targetNode.transform.position);
-            Debug.Log($"[{enemy.name}] CircleAndShoot SO: Requested path to circling point at {targetNode.transform.position}.");
+            Debug.Log($"[{enemy.name}] CircleAndShoot SO: Requested path to circling point at {targetNode.transform.position} (smooth multi-node path).");
             if (enemy.agentMover != null) enemy.agentMover.canMove = true;
         }
         else
@@ -154,6 +212,7 @@ public class EnemyAttackCircleAndShoot : EnemyAttackSOBase
                 Debug.LogWarning($"[{enemy.name}] CircleAndShoot SO: No valid node found for circling path.");
             }
         }
+        */
     }
 
     // --- ADDED: Helper Methods for Shooting (Moved from State) ---

@@ -68,7 +68,7 @@ CircleCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_Radius: 6
+  m_Radius: 7
 --- !u!114 &5954257212766886800
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -207,6 +207,7 @@ GameObject:
   - component: {fileID: 9174222221256156721}
   - component: {fileID: 3432804763593945677}
   - component: {fileID: -5099111900717330524}
+  - component: {fileID: -8782834178904668632}
   m_Layer: 6
   m_Name: Devil
   m_TagString: Enemy
@@ -293,7 +294,7 @@ Rigidbody2D:
   m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_GravityScale: 0
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 3896a2ef8683d6f428506c7bb7391982, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -425,11 +426,24 @@ MonoBehaviour:
   turnSpeed: 10
   avoidanceLayer:
     serializedVersion: 2
-    m_Bits: 64
-  avoidanceRadius: 1
-  avoidanceWeight: 2
-  canMove: 1
+    m_Bits: 0
+  avoidanceRadius: 0
+  avoidanceWeight: 0
+  canMove: 0
   isFollowingPath: 0
+--- !u!114 &-8782834178904668632
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6750361400534454914}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6cc390777ae518845881ff3e31a9c0cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  blockageCost: 20
 --- !u!1 &8652582045148003831
 GameObject:
   m_ObjectHideFlags: 0
@@ -498,7 +512,7 @@ CircleCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_Radius: 3.5
+  m_Radius: 5
 --- !u!114 &5902858278954718864
 MonoBehaviour:
   m_ObjectHideFlags: 0

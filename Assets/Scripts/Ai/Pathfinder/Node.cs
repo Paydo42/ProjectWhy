@@ -13,6 +13,8 @@ public class Node : MonoBehaviour
     // Obstacle Check
     public bool isObstacle = false; // Is this node blocked?
     public LayerMask obstacleLayer; // Layer mask to detect obstacles
+    [Tooltip("Extra cost to walk here (e.g., mud, or another enemy standing here)")]
+    public int movementPenalty = 0;
     private float checkRadius = 0.4f; // Radius to check for obstacles around the node
 
     private void Start()

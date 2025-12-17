@@ -111,7 +111,7 @@ public class AStarManager : MonoBehaviour
                 }
                 // --- END REVERT ---
 
-                float newMovementCostToNeighbour = currentNode.gCost + GetDistance(currentNode, neighbour);
+                float newMovementCostToNeighbour = currentNode.gCost + GetDistance(currentNode, neighbour) + neighbour.movementPenalty;;
                 bool isInOpenSet = openSet.Contains(neighbour);
 
                 if (newMovementCostToNeighbour < neighbour.gCost || !isInOpenSet)

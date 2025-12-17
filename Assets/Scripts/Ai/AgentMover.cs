@@ -106,19 +106,21 @@ public class AgentMover : MonoBehaviour
             Vector2 avoidanceDirection = CalculateAvoidance();
             
             Vector2 moveDirection = (pathDirection + (avoidanceDirection * avoidanceWeight)).normalized;
-            if (spriteRenderer != null && Mathf.Abs(moveDirection.x) > 0.1f)
-            {
-                // flipX is true when facing LEFT, false when facing RIGHT
-                spriteRenderer.flipX = moveDirection.x < 0;
-            }
             Vector2 targetVelocity = moveDirection * moveSpeed;
 
+          
+          
             rb.linearVelocity = Vector2.Lerp(
                 rb.linearVelocity,
                 targetVelocity,
                 Time.fixedDeltaTime * turnSpeed
             );
 
+            if (spriteRenderer != null && Mathf.Abs(pathDirection.x) > 0.1f)
+            {
+                  // flipX is true when facing LEFT, false when facing RIGHT
+                  spriteRenderer.flipX = pathDirection.x < 0;
+            }
             if (Vector2.Distance(rb.position, targetWaypoint) < waypointReachedDistance)
             {
                 currentWaypointIndex++;
