@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &2460823134707737384
+--- !u!1 &2855057050874227108
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,7 +8,7 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 3064279820234571430}
+  - component: {fileID: 872303955462092500}
   m_Layer: 7
   m_Name: FirePoint
   m_TagString: Untagged
@@ -16,16 +16,16 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &3064279820234571430
+--- !u!4 &872303955462092500
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2460823134707737384}
+  m_GameObject: {fileID: 2855057050874227108}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.08, y: -0.1, z: 0}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -48,6 +48,7 @@ GameObject:
   - component: {fileID: 7608340051444601404}
   - component: {fileID: 6575431305514378242}
   - component: {fileID: 8169679568979283498}
+  - component: {fileID: 856711463589350814}
   m_Layer: 7
   m_Name: Player
   m_TagString: Player
@@ -68,7 +69,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 3064279820234571430}
+  - {fileID: 872303955462092500}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &7764074845936867305
@@ -115,7 +116,7 @@ SpriteRenderer:
   m_SortingLayerID: 909827339
   m_SortingLayer: 4
   m_SortingOrder: 0
-  m_Sprite: {fileID: 3967019532428607231, guid: ecbe3c3ea67a29f49b8f3dfb53776bb2, type: 3}
+  m_Sprite: {fileID: -4742525996146645213, guid: d171c959722ca5a46b20ba20b1c6a12e, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -202,7 +203,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 6575431305514378242}
         m_TargetAssemblyTypeName: PlayerShooting, Assembly-CSharp
-        m_MethodName: OnShoot
+        m_MethodName: OnFire
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -307,9 +308,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 001434246ebd5a34d84b355b1063caca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 10
+  moveSpeed: 5
   lastMoveDir: {x: 1, y: 0}
-  firePoint: {fileID: 3064279820234571430}
+  firePoint: {fileID: 872303955462092500}
 --- !u!95 &4650370356442569710
 Animator:
   serializedVersion: 7
@@ -370,7 +371,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 0.9375, y: 1.25}
+    oldSize: {x: 0.6666667, y: 1.3333334}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -390,9 +391,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4cca79f2e62bd3a4aadfd03b5717e25f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerMovement: {fileID: 3401039166925790002}
+  erailPrefab: {fileID: 5986840554202229192, guid: f048e3e3ec70a724abe9b4c667c03169, type: 3}
   projectilePrefab: {fileID: 5740292498457461232, guid: 0ed2cbf6377cc4e4684e5f9c8ff834ec, type: 3}
-  firePoint: {fileID: 3064279820234571430}
-  fireRate: 0.2
+  erailSpawnPoint: {fileID: 872303955462092500}
+  fireRate: 0.52
+  projectileSpeed: 12
 --- !u!114 &8169679568979283498
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -407,10 +411,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 8
   currentHealth: 0
-  fullHeart: {fileID: 5800323473991117985, guid: 7603ea12cfb8ec34fb6028731e91a5f2, type: 3}
-  halfHeart: {fileID: -5722079721010559, guid: 47ed6c237cc3f45469193becb4e83956, type: 3}
-  emptyHeart: {fileID: 8306992596269193588, guid: 62136eb9d04ccec439895c3d35a6e49e, type: 3}
+  fullHeart: {fileID: 1917348172533420592, guid: 6cf86fb7a00e823429a9c1272c89aa06, type: 3}
+  halfHeart: {fileID: -7098413259201188984, guid: ad318bdd9f1dcb945b5bacab247ed8e1, type: 3}
+  emptyHeart: {fileID: 4552091973820549937, guid: 1b5bdaa1400aaf04497802d4a62ca12c, type: 3}
   healthUiManager: {fileID: 0}
   damageCooldown: 0.2
   invulnerabilityFlashRate: 0.1
   damageFlashColor: {r: 1, g: 0, b: 0, a: 1}
+--- !u!114 &856711463589350814
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8027430821505043370}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d003955756c04340bcd37bd58b1bbaf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

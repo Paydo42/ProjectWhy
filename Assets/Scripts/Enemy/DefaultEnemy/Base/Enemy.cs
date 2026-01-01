@@ -8,7 +8,9 @@ using System.IO;
 public enum EnemyStartState
 {
     StartIdle,  // The default behavior
-    StartChase // For enemies like the Devil that chase immediately
+    StartChase, // For enemies like the Devil that chase immediately
+
+    StartAttack // For enemies that attack immediately upon activation
     // You could add more later, like StartPatrol, StartFlee, etc.
 }
 
@@ -268,6 +270,12 @@ public class Enemy : MonoBehaviour, IDamageable, IEnemyMoveable, ITriggerCheckAb
                 Debug.Log($"'{name}' activated into Idle State.");
                 // Ensure Aggro is reset if starting in Idle
                 SetAggroStatus(false);
+                break;
+
+            case EnemyStartState.StartAttack:
+                stateMachine.Initialize(AttackState);
+                Debug.Log($"'{name}' activated directly into Attack State.");
+                SetAggroStatus(true); // Ensure Aggro is set
                 break;
         }
         // Reset attack distance flag on activation

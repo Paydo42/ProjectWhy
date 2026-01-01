@@ -1,0 +1,351 @@
+fileFormatVersion: 2
+guid: f23bf43d8e182014aa6af0aba2d6d529
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 282187302423919849
+    second: BowAnimation_0
+  - first:
+      213: 875029780040579274
+    second: BowAnimation_1
+  - first:
+      213: -759053879993379668
+    second: BowAnimation_2
+  - first:
+      213: -7108219530464454278
+    second: BowAnimation_3
+  - first:
+      213: -8470400063508549461
+    second: BowAnimation_4
+  - first:
+      213: -4207093624753277922
+    second: BowAnimation_5
+  - first:
+      213: 6610765113978690845
+    second: BowAnimation_6
+  - first:
+      213: 117649262897260267
+    second: BowAnimation_7
+  - first:
+      213: 6227140278639044655
+    second: BowAnimation_8
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 24
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: BowAnimation_0
+      rect:
+        serializedVersion: 2
+        x: 1
+        y: 0
+        width: 48
+        height: 61
+      alignment: 9
+      pivot: {x: 0.62043923, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9ec7a114bd78ae300800000000000000
+      internalID: 282187302423919849
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BowAnimation_1
+      rect:
+        serializedVersion: 2
+        x: 72
+        y: 1
+        width: 48
+        height: 59
+      alignment: 9
+      pivot: {x: 0.47166157, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ac8f437e2fab42c00800000000000000
+      internalID: 875029780040579274
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BowAnimation_2
+      rect:
+        serializedVersion: 2
+        x: 140
+        y: 2
+        width: 48
+        height: 57
+      alignment: 9
+      pivot: {x: 0.38664564, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ca4dc9d848c4775f0800000000000000
+      internalID: -759053879993379668
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BowAnimation_3
+      rect:
+        serializedVersion: 2
+        x: 209
+        y: 5
+        width: 48
+        height: 51
+      alignment: 9
+      pivot: {x: 0.2945455, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a791c2d7ff78a5d90800000000000000
+      internalID: -7108219530464454278
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BowAnimation_4
+      rect:
+        serializedVersion: 2
+        x: 274
+        y: 5
+        width: 47
+        height: 51
+      alignment: 9
+      pivot: {x: 0.28293887, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ba070253508137a80800000000000000
+      internalID: -8470400063508549461
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BowAnimation_5
+      rect:
+        serializedVersion: 2
+        x: 323
+        y: 1
+        width: 49
+        height: 59
+      alignment: 9
+      pivot: {x: 0.5485815, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e1435cf63a66d95c0800000000000000
+      internalID: -4207093624753277922
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BowAnimation_6
+      rect:
+        serializedVersion: 2
+        x: 410
+        y: 1
+        width: 23
+        height: 59
+      alignment: 9
+      pivot: {x: 0.24864794, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d1d9e3888d72ebb50800000000000000
+      internalID: 6610765113978690845
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BowAnimation_7
+      rect:
+        serializedVersion: 2
+        x: 474
+        y: 0
+        width: 26
+        height: 61
+      alignment: 9
+      pivot: {x: 0.21225563, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: be6e31b9169f1a100800000000000000
+      internalID: 117649262897260267
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BowAnimation_8
+      rect:
+        serializedVersion: 2
+        x: 538
+        y: 0
+        width: 23
+        height: 61
+      alignment: 9
+      pivot: {x: 0.21908171, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f28aec2371f3b6650800000000000000
+      internalID: 6227140278639044655
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: ff20ff6bb6316d54b8e5e7db1eba4ea2
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      BowAnimation_0: 282187302423919849
+      BowAnimation_1: 875029780040579274
+      BowAnimation_2: -759053879993379668
+      BowAnimation_3: -7108219530464454278
+      BowAnimation_4: -8470400063508549461
+      BowAnimation_5: -4207093624753277922
+      BowAnimation_6: 6610765113978690845
+      BowAnimation_7: 117649262897260267
+      BowAnimation_8: 6227140278639044655
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

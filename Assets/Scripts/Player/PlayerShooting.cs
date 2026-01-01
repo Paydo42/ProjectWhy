@@ -1,16 +1,20 @@
+
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerShooting : MonoBehaviour
 {
-    public GameObject projectilePrefab;
-    public Transform firePoint;
-    public float fireRate = 0.5f;
-    private float nextFireTime = 0f;
-    private PlayerMovement playerMovement;
+   [Header("References")]
+    [SerializeField] private PlayerMovement playerMovement;
+    [SerializeField] private GameObject erailPrefab;
+    [SerializeField] private GameObject projectilePrefab;
+    [SerializeField] private Transform erailSpawnPoint; 
 
-    // --- FIX: Add a boolean to track if the fire button is being held down ---
-    private bool isFiring = false;
+    [Header("Settings")]
+    [SerializeField] private float fireRate = 0.5f;
+    [SerializeField] private float projectileSpeed = 12f;
+    private float nextFireTime = 0f;
+    
 
     void Awake()
     {
@@ -20,46 +24,51 @@ public class PlayerShooting : MonoBehaviour
     // --- FIX: This method now just updates the isFiring state based on button press and release ---
     public void OnFire(InputAction.CallbackContext context)
     {
-        if (context.performed) // Called once when the button is pressed
+       if (context.performed && Time.time >= nextFireTime)
         {
-            isFiring = true;
+            SummonErail();
         }
-        else if (context.canceled) // Called once when the button is released
+    }   
+     private void SummonErail()
+    {
+       nextFireTime = Time.time + fireRate;
+       Vector2 aimDirection = playerMovement.lastMoveDir;
+       if (aimDirection == Vector2.zero)
         {
-            isFiring = false;
+            aimDirection = Vector2.right; // Default direction if none
+        }
+        float angle = Mathf.Atan2(aimDirection.y, aimDirection.x) * Mathf.Rad2Deg;
+        Quaternion erailRotation = Quaternion.Euler(0, 0, angle);
+        GameObject erailObj = PoolManager.Instance.Spawn(erailPrefab, erailSpawnPoint.position, erailRotation);
+
+        Erail erailScript = erailObj.GetComponent<Erail>();
+        if (erailScript != null)
+        {
+            erailScript.Initialize(erailPrefab, projectilePrefab, aimDirection, projectileSpeed);
         }
     }
 
     // --- FIX: Added an Update method to handle continuous firing ---
-    void Update()
-    {
-        // If the fire button is being held down AND the fire rate cooldown has passed...
-        if (isFiring && Time.time >= nextFireTime)
-        {
-            // ...update the cooldown timer...
-            nextFireTime = Time.time + fireRate;
-            // ...and fire a shot.
-            Shoot();
-        }
-    }
+  
 
-    void Shoot()
+ /* public void SpawnProjectile()
     {
-        if (projectilePrefab == null || firePoint == null || playerMovement == null) return;
+        if (projectilePrefab == null || erailSpawnPoint == null || playerMovement == null) return;
 
         // Spawn a projectile with a default rotation (the projectile will rotate itself)
-        GameObject projectileInstance = PoolManager.Instance.Spawn(projectilePrefab, firePoint.position, Quaternion.identity);
+        Vector2 shootDirection = playerMovement.lastMoveDir;    
+        if (shootDirection == Vector2.zero)
+        {
+            shootDirection = Vector2.right; // Default direction if none
+        }
+        GameObject projectileInstance = PoolManager.Instance.Spawn(projectilePrefab, erailSpawnPoint.position, Quaternion.identity);
         
         Projectile projectile = projectileInstance.GetComponent<Projectile>();
-        if (projectile != null)
+      if (projectile != null)
         {
-            // Tell the projectile its original prefab so it can return to the pool
-            projectile.Initialize(projectilePrefab);
-            
-            // Tell the projectile to fire in the player's last known direction.
-            // The projectile's Fire() method handles both its rotation and velocity correctly.
-            projectile.Fire(playerMovement.lastMoveDir);
+            projectile.Initialize(projectilePrefab); // Important for return to pool
+            projectile.SetDirection(shootDirection, projectileSpeed);
         }
-    }
+    }*/
 }
 

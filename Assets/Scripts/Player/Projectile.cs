@@ -27,19 +27,14 @@ public class Projectile : MonoBehaviour
 
     // --- THE MAIN FIX ---
     // This new function handles both movement and rotation.
-    public void Fire(Vector2 direction)
+    public void SetDirection(Vector2 direction, float speed)
     {
-        Debug.Log($"Projectile received direction: {direction}");
         if (rb != null)
         {
-            // 1. Set the movement velocity based on the direction
             rb.linearVelocity = direction.normalized * speed;
-
-            // 2. Calculate the angle from the direction vector
+            // Optional: Rotate sprite to face direction
             float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-            Debug.Log($"Calculated Angle: {angle}");
-            // 3. Set the rotation of the arrow's sprite to match the angle
-             transform.rotation = Quaternion.Euler(0, 0, angle - 90f);
+            transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
         }
     }
 

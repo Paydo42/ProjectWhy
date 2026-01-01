@@ -22,7 +22,7 @@ public class GridGenerator : MonoBehaviour
 
     private Node[,] grid; // 2D array to store the generated nodes
     private float nodeDiameter;
-    private int gridSizeX, gridSizeY;
+    public int gridSizeX, gridSizeY;
     private Vector2 actualGridSize; // Store the size derived from the collider
     private Vector3 gridOrigin; // Store the calculated origin (bottom-left)
 
@@ -280,7 +280,43 @@ public class GridGenerator : MonoBehaviour
 
          return potentialNode;
     }
+    public List<Node> GetNodesOverlappingBounds(Bounds bounds)
+    {
+        List<Node> overlappingNodes = new List<Node>();
+        if (grid == null) return overlappingNodes;
 
+        // 1. Convert world bounds (min/max) to grid coordinates (x,y)
+        // We reverse the math used in CreateGrid/InitializeGrid
+        // Formula: Index = (WorldPos - Origin) / Diameter
+        
+        // Find bottom-left index
+        int xMin = Mathf.FloorToInt((bounds.min.x - gridOrigin.x) / nodeDiameter);
+        int yMin = Mathf.FloorToInt((bounds.min.y - gridOrigin.y) / nodeDiameter);
+
+        // Find top-right index
+        int xMax = Mathf.FloorToInt((bounds.max.x - gridOrigin.x) / nodeDiameter);
+        int yMax = Mathf.FloorToInt((bounds.max.y - gridOrigin.y) / nodeDiameter);
+
+        // 2. Clamp values to keep them valid within the grid array
+        xMin = Mathf.Clamp(xMin, 0, gridSizeX - 1);
+        xMax = Mathf.Clamp(xMax, 0, gridSizeX - 1);
+        yMin = Mathf.Clamp(yMin, 0, gridSizeY - 1);
+        yMax = Mathf.Clamp(yMax, 0, gridSizeY - 1);
+
+        // 3. Loop through that rectangular area and collect nodes
+        for (int x = xMin; x <= xMax; x++)
+        {
+            for (int y = yMin; y <= yMax; y++)
+            {
+                if (grid[x, y] != null && !grid[x, y].isObstacle)
+                {
+                    overlappingNodes.Add(grid[x, y]);
+                }
+            }
+        }
+
+        return overlappingNodes;
+    }
      // Helper to find the nearest non-obstacle node if the target point maps to an invalid one
      private Node FindNearestValidNode(Vector3 worldPosition)
      {
