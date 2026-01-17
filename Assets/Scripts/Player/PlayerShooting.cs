@@ -14,11 +14,15 @@ public class PlayerShooting : MonoBehaviour
     [SerializeField] private float fireRate = 0.5f;
     [SerializeField] private float projectileSpeed = 12f;
     private float nextFireTime = 0f;
-    
+    [Header("Audio  ")]
+
+    [SerializeField] private AudioClip erailSpawnClip;
+    private AudioSource audioSource;
 
     void Awake()
     {
         playerMovement = GetComponent<PlayerMovement>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     // --- FIX: This method now just updates the isFiring state based on button press and release ---
@@ -37,10 +41,16 @@ public class PlayerShooting : MonoBehaviour
         {
             aimDirection = Vector2.right; // Default direction if none
         }
+
         float angle = Mathf.Atan2(aimDirection.y, aimDirection.x) * Mathf.Rad2Deg;
         Quaternion erailRotation = Quaternion.Euler(0, 0, angle);
         GameObject erailObj = PoolManager.Instance.Spawn(erailPrefab, erailSpawnPoint.position, erailRotation);
-
+        
+        if (audioSource != null && erailSpawnClip != null)
+        {
+            audioSource.PlayOneShot(erailSpawnClip);
+        }
+        
         Erail erailScript = erailObj.GetComponent<Erail>();
         if (erailScript != null)
         {

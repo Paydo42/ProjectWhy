@@ -12,12 +12,12 @@ public class Upgrade : MonoBehaviour
     public static Upgrade upgradeInRange;
     public bool PlayerInRange { get; private set; }
     private Animator animator;
-    private RoomBounds roomBounds;
-
+    public RoomBounds roomBounds;
+   
     void Awake()
     {
         animator = GetComponent<Animator>();
-        roomBounds = GetComponentInParent<RoomBounds>();
+      
 
         // Set upgrade type for animator
         SetUpgradeTypeForAnimator();

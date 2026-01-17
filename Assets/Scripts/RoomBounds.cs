@@ -20,6 +20,7 @@ public class RoomBounds : MonoBehaviour
     public List<Door> roomDoors = new List<Door>();
 
     [Header("Reward Settings")]
+    public GameObject pillarPrefab;
     public int minRewards = 2;
     public int maxRewards = 3;
     public List<GameObject> spawnablePrefabs = new List<GameObject>(); // For rewards, not enemies
@@ -229,6 +230,11 @@ public class RoomBounds : MonoBehaviour
     {
         if (Random.value > spawnChance) return;
         if (spawnablePrefabs.Count == 0) return;
+        if (pillarPrefab == null )
+        {
+            Debug.LogWarning("Pillar prefab is not assigned in RoomBounds.");
+            return;
+        }
 
         ClearExistingRewards();
         int rewardCount = Random.Range(minRewards, maxRewards + 1);
@@ -244,21 +250,24 @@ public class RoomBounds : MonoBehaviour
             int spawnIndex = Random.Range(0, availableSpawnPoints.Count);
             Transform spawnPoint = availableSpawnPoints[spawnIndex];
             availableSpawnPoints.RemoveAt(spawnIndex);
-
-            GameObject reward = Instantiate(prefabToSpawn, spawnPoint.position, Quaternion.identity, transform);
-
-            Vector3 fixedPos = reward.transform.position;
-            fixedPos.z = 0f;
-            reward.transform.position = fixedPos;
-
-            Upgrade upgrade = reward.GetComponent<Upgrade>();
-            if (upgrade != null)
+            GameObject pillarObj = Instantiate(pillarPrefab, spawnPoint.position, Quaternion.identity, transform);
+            
+            PillarController pillarController = pillarObj.GetComponent<PillarController>();
+            if (pillarController != null)
             {
-                currentUpgrades.Add(upgrade);
+                pillarController.Initialize(prefabToSpawn, this);
             }
         }
-    }
+        
+        }
 
+    public void RegisterSpawnedUpgrade(Upgrade upgrade)
+    {
+        if (upgrade != null)
+        {
+            currentUpgrades.Add(upgrade);
+        }
+    }
     public void ClearExistingRewards()
     {
         foreach (Upgrade upgrade in currentUpgrades)

@@ -5,6 +5,8 @@ public class Projectile : MonoBehaviour
     public float speed = 10f;
     public float lifetime = 2f;
     public float damage = 1f;
+    [Header("Audio")]
+    public AudioClip hitSound;
 
     public GameObject OriginalPrefab { get; private set; }
     private Rigidbody2D rb;
@@ -44,8 +46,16 @@ public class Projectile : MonoBehaviour
         if (damageable != null && other.CompareTag("Enemy"))
         {
             damageable.TakeDamage(damage);
+            Enemy enemyScript = other.GetComponent<Enemy>();
+            if (enemyScript != null)
+            {
+                enemyScript.ApplyKnockback(transform.position, 5f);
+            }
         }
-
+        if (hitSound != null)
+        {
+            AudioSource.PlayClipAtPoint(hitSound, transform.position);
+        }
         // Return to the pool immediately upon hitting anything
         ReturnToPool();
     }

@@ -115,12 +115,12 @@ TextureImporter:
       name: PillarAnimation_0
       rect:
         serializedVersion: 2
-        x: 1
+        x: 0
         y: 0
-        width: 48
-        height: 35
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 56
+        height: 75
+      alignment: 9
+      pivot: {x: 0.5, y: 0.2}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -138,11 +138,11 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 55
-        y: 1
-        width: 57
-        height: 62
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        y: 0
+        width: 56
+        height: 75
+      alignment: 9
+      pivot: {x: 0.5, y: 0.2}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -161,10 +161,10 @@ TextureImporter:
         serializedVersion: 2
         x: 112
         y: 0
-        width: 57
+        width: 56
         height: 75
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      alignment: 9
+      pivot: {x: 0.5, y: 0.2}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -181,12 +181,12 @@ TextureImporter:
       name: PillarAnimation_3
       rect:
         serializedVersion: 2
-        x: 167
+        x: 168
         y: 0
-        width: 57
+        width: 56
         height: 75
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      alignment: 9
+      pivot: {x: 0.5, y: 0.2}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -203,12 +203,12 @@ TextureImporter:
       name: PillarAnimation_4
       rect:
         serializedVersion: 2
-        x: 230
-        y: 5
-        width: 41
-        height: 70
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 224
+        y: 0
+        width: 56
+        height: 75
+      alignment: 9
+      pivot: {x: 0.5, y: 0.2}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -225,7 +225,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 47ed2151e7d770e45ad9fba7fcbc6927
     internalID: 0
     vertices: []
     indices: 

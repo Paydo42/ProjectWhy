@@ -1,0 +1,377 @@
+fileFormatVersion: 2
+guid: 8defb873fb5c66241a44382dcf445019
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 5805073666888539872
+    second: WraithSon_0
+  - first:
+      213: -8973927158795781329
+    second: WraithSon_1
+  - first:
+      213: -8355533760568686221
+    second: WraithSon_2
+  - first:
+      213: -3023147068026952793
+    second: WraithSon_3
+  - first:
+      213: 4401552954843321092
+    second: WraithSon_4
+  - first:
+      213: -6101487955158034730
+    second: WraithSon_5
+  - first:
+      213: -1796992024853633936
+    second: WraithSon_6
+  - first:
+      213: 4687337343298223009
+    second: WraithSon_7
+  - first:
+      213: -5629073393246205133
+    second: WraithSon_8
+  - first:
+      213: -3409573521528031166
+    second: WraithSon_9
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 24
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: WraithSon_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 42
+        width: 37
+        height: 42
+      alignment: 9
+      pivot: {x: 0.53, y: 0.11}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0ee9dd15eb3cf8050800000000000000
+      internalID: 5805073666888539872
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WraithSon_1
+      rect:
+        serializedVersion: 2
+        x: 37
+        y: 42
+        width: 37
+        height: 42
+      alignment: 9
+      pivot: {x: 0.53, y: 0.11}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f2b3fb38bc4367380800000000000000
+      internalID: -8973927158795781329
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WraithSon_2
+      rect:
+        serializedVersion: 2
+        x: 74
+        y: 42
+        width: 37
+        height: 42
+      alignment: 9
+      pivot: {x: 0.53, y: 0.11}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3790584705e2b0c80800000000000000
+      internalID: -8355533760568686221
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WraithSon_3
+      rect:
+        serializedVersion: 2
+        x: 111
+        y: 42
+        width: 37
+        height: 42
+      alignment: 9
+      pivot: {x: 0.53, y: 0.11}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7a36d7a42cf9b06d0800000000000000
+      internalID: -3023147068026952793
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WraithSon_4
+      rect:
+        serializedVersion: 2
+        x: 148
+        y: 42
+        width: 37
+        height: 42
+      alignment: 9
+      pivot: {x: 0.53, y: 0.11}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 403d18d8715751d30800000000000000
+      internalID: 4401552954843321092
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WraithSon_5
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 37
+        height: 42
+      alignment: 9
+      pivot: {x: 0.53, y: 0.11}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6d61b772809235ba0800000000000000
+      internalID: -6101487955158034730
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WraithSon_6
+      rect:
+        serializedVersion: 2
+        x: 37
+        y: 0
+        width: 37
+        height: 42
+      alignment: 9
+      pivot: {x: 0.53, y: 0.11}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 074a366364dcf07e0800000000000000
+      internalID: -1796992024853633936
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WraithSon_7
+      rect:
+        serializedVersion: 2
+        x: 74
+        y: 0
+        width: 37
+        height: 42
+      alignment: 9
+      pivot: {x: 0.53, y: 0.11}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1abb6b9aa74cc0140800000000000000
+      internalID: 4687337343298223009
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WraithSon_8
+      rect:
+        serializedVersion: 2
+        x: 111
+        y: 0
+        width: 37
+        height: 42
+      alignment: 9
+      pivot: {x: 0.53, y: 0.11}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 33b05fca29381e1b0800000000000000
+      internalID: -5629073393246205133
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WraithSon_9
+      rect:
+        serializedVersion: 2
+        x: 148
+        y: 0
+        width: 37
+        height: 42
+      alignment: 9
+      pivot: {x: 0.53, y: 0.11}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2487eb562f2cea0d0800000000000000
+      internalID: -3409573521528031166
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: e8494be4e216d2044bcf75356299d842
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      WraithSon_0: 5805073666888539872
+      WraithSon_1: -8973927158795781329
+      WraithSon_2: -8355533760568686221
+      WraithSon_3: -3023147068026952793
+      WraithSon_4: 4401552954843321092
+      WraithSon_5: -6101487955158034730
+      WraithSon_6: -1796992024853633936
+      WraithSon_7: 4687337343298223009
+      WraithSon_8: -5629073393246205133
+      WraithSon_9: -3409573521528031166
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

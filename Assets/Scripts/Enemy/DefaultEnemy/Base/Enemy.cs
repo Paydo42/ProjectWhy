@@ -3,6 +3,7 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Unity.VisualScripting;
 
 
 public enum EnemyStartState
@@ -43,6 +44,12 @@ public class Enemy : MonoBehaviour, IDamageable, IEnemyMoveable, ITriggerCheckAb
      public Vector3 currentPathfindingTarget; // Where are we trying to go?
    // --- MODIFIED: Public getter, private setter. Set via Activate ---
     public GridGenerator currentRoomGridGenerator { get; private set; }
+
+    [Header("Knockback Settings")]
+    [SerializeField] private float defaultknockbackForce = 5f;
+    [SerializeField] private float knockbackDuration = 0.2f;
+    private bool isKnockedBack = false;
+   // private float maxKnockbackVelocity = 10f;
     // --- END MODIFICATION ---
 
     [Header("Combat Config")] // Header for combat-related settings
@@ -181,8 +188,8 @@ public class Enemy : MonoBehaviour, IDamageable, IEnemyMoveable, ITriggerCheckAb
 
     public virtual void Update()
     {
-        if (!isActivated) return;
-
+        if (!isActivated || isKnockedBack) return;
+        
         // Delegate state logic to the current state
         stateMachine.CurrentEnemyState?.FrameUpdate();
         if (isPathfindingActive)
@@ -201,7 +208,7 @@ public class Enemy : MonoBehaviour, IDamageable, IEnemyMoveable, ITriggerCheckAb
 
     public virtual void FixedUpdate()
     {
-        if (!isActivated) return;
+        if (!isActivated || isKnockedBack ) return;
 
         // Delegate physics logic (if any) to the current state
         stateMachine.CurrentEnemyState?.PhysicsUpdate();
@@ -248,6 +255,7 @@ public class Enemy : MonoBehaviour, IDamageable, IEnemyMoveable, ITriggerCheckAb
         // Reset Animator
         if (animator != null)
         {
+            animator.Rebind(); // Reset animator completely
             animator.ResetTrigger(deathTriggerName);
             animator.ResetTrigger(takeDamageTriggerName);
             // animator.ResetTrigger(attackTriggerName); // Uncomment if using
@@ -403,6 +411,41 @@ public class Enemy : MonoBehaviour, IDamageable, IEnemyMoveable, ITriggerCheckAb
         }
     }
 
+    // Applies knockback force away from the damage source
+    public void ApplyKnockback(Vector3 damageSourcePosition , float knockbackForce = -1f)
+    {
+        if (!isActivated || isKnockedBack || RB == null) return;
+
+        float force = (knockbackForce < 0f ) ? defaultknockbackForce : knockbackForce;
+
+         Vector2 direction = (transform.position - damageSourcePosition).normalized;
+         StartCoroutine(KnockbackRoutine(direction, force));
+         Debug.Log($"'{name}' is knocked back with force {force}.");
+        
+
+    }
+  private System.Collections.IEnumerator KnockbackRoutine(Vector2 direction, float force)
+    {
+        isKnockedBack = true;
+
+        if ( agentMover != null)
+        {
+            agentMover.canMove = false; // Disable movement during knockback
+        }
+
+        RB.linearVelocity = Vector2.zero; // Reset current velocity
+        RB.AddForce(direction * force, ForceMode2D.Impulse);
+        
+        yield return new WaitForSeconds(knockbackDuration);
+
+        RB.linearVelocity = Vector2.zero; // Stop movement after knockback
+        isKnockedBack = false;
+        if (agentMover != null && isActivated)
+        {
+            agentMover.canMove = true; // Re-enable movement
+        }
+        Debug.Log($"'{name}' knockback ended.");
+    }
     // Obsolete for direct movement, potentially useful for knockback via AddForce
     public void MoveEnemy(Vector2 forceOrVelocity)
     {
@@ -441,7 +484,7 @@ public class Enemy : MonoBehaviour, IDamageable, IEnemyMoveable, ITriggerCheckAb
            if (spriteRenderer != null)
         {
             // flipX is true when facing LEFT, false when facing RIGHT
-            spriteRenderer.flipX = !shouldFaceRight;
+            //spriteRenderer.flipX = !shouldFaceRight;
         }
         // --- END MODIFICATION ---
 

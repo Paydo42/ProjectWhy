@@ -119,7 +119,7 @@ public class AgentMover : MonoBehaviour
             if (spriteRenderer != null && Mathf.Abs(pathDirection.x) > 0.1f)
             {
                   // flipX is true when facing LEFT, false when facing RIGHT
-                  spriteRenderer.flipX = pathDirection.x < 0;
+                //  spriteRenderer.flipX = pathDirection.x < 0;
             }
             if (Vector2.Distance(rb.position, targetWaypoint) < waypointReachedDistance)
             {

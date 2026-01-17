@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b03ee03e4204a1341a7e848018f49012, type: 3}
   m_Name: UpgradeSpeed
   m_EditorClassIdentifier: 
-  speedIncrease: 10
+  speedIncrease: 3
