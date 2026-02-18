@@ -67,6 +67,8 @@ public class EnemyAttackOracle : EnemyAttackSOBase
             {
                 ShootPredictive();
                 _timer = 0f;
+                enemy.StartAttackAnimation();
+
             }
         }
     }

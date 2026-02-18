@@ -53,6 +53,14 @@ public class EnemyAttackSOBase : ScriptableObject
     // Kept for flexibility, but might not be used often with this architecture.
     public virtual void DoAnimationTriggerEventLogic(Enemy.AnimationTriggerType triggerType) { }
 
+    /// <summary>
+    /// Called by Enemy.PerformAttackFromSO() when an attack should happen.
+    /// Override this in child classes to implement the actual attack logic (spawn projectile, etc.)
+    /// This is called either immediately (if useAnimationDrivenAttack = false) or 
+    /// from an animation event (if useAnimationDrivenAttack = true).
+    /// </summary>
+    public virtual void PerformAttack() { }
+
     // Called by DoExitLogic by default, or manually if needed.
     // Resets any internal state within the child SO.
     public virtual void ResetValues() { }

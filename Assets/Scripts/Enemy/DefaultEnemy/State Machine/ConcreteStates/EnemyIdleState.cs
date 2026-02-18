@@ -12,6 +12,9 @@ public class EnemyIdleState : EnemyState
 
         if (enemy.agentMover != null) enemy.agentMover.canMove = true;
 
+        // Delegate enter logic to the ScriptableObject
+        enemy.EnemyIdleBaseInstance?.DoEnterLogic();
+
         /* --- Configure Steering Behaviours ---
         if (enemy.seekBehaviour != null) enemy.seekBehaviour.enabled = true;
         if (enemy.circleTargetBehaviour != null) enemy.circleTargetBehaviour.enabled = false;
@@ -20,15 +23,26 @@ public class EnemyIdleState : EnemyState
         // Disable any other specific movement behaviours here */
     }
 
-    public override void ExitState() { base.ExitState(); }
+    public override void ExitState() 
+    { 
+        base.ExitState();
+        enemy.EnemyIdleBaseInstance?.DoExitLogic();
+    }
 
     public override void FrameUpdate()
     {
         base.FrameUpdate();
-        if (enemy.IsAggroed) {
-            enemy.stateMachine.ChangeState(enemy.ChaseState);
-        }
+        
+        // Delegate ALL idle logic to the ScriptableObject
+        // This allows different enemies to have different idle behaviors:
+        // - Default: checks IsAggroed → goes to ChaseState
+        // - Twins: uses left/right raycasts → goes directly to AttackState
+        enemy.EnemyIdleBaseInstance?.DoFrameUpdateLogic();
     }
 
-    public override void PhysicsUpdate() { base.PhysicsUpdate(); }
+    public override void PhysicsUpdate() 
+    { 
+        base.PhysicsUpdate();
+        enemy.EnemyIdleBaseInstance?.DoPhysicsLogic();
+    }
 }

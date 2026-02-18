@@ -66,9 +66,8 @@ public class PlayerMovement : MonoBehaviour
         UpdateFirePointRotation();
         UpdateFirePointPosition();
     }
-      private void UpdateFirePointRotation() {
-        
-    
+      private void UpdateFirePointRotation()
+     {
      if (firePoint != null)
         {
             float angle = Mathf.Atan2(lastMoveDir.y, lastMoveDir.x) * Mathf.Rad2Deg;
@@ -81,21 +80,29 @@ public class PlayerMovement : MonoBehaviour
     {
         if (firePoint != null)
         {
-            float distance = 0.5f; // Distance from player center
+            float distance = 1f; // Distance from player center
             float xPosition;
-
+            
             // Handle horizontal direction
             if (lastMoveDir.x < 0) // Facing left
             {
-                xPosition = lastMoveDir.x * -distance; // Keep firePoint on the left side
+                xPosition = lastMoveDir.x * distance; // Keep firePoint on the left side
             }
             else // Facing right or neutral
             {
                 xPosition = lastMoveDir.x * distance; // Keep firePoint on the right side
+
             }
 
             // For vertical movement
             float yPosition = lastMoveDir.y * distance;
+            
+            // Add Y offset when facing horizontally (left or right)
+            bool isFacingHorizontally = Mathf.Abs(lastMoveDir.x) > Mathf.Abs(lastMoveDir.y);
+            if (isFacingHorizontally)
+            {
+                yPosition += 0.5f;
+            }
 
             Vector3 newPosition = new Vector3(xPosition, yPosition, 0);
             firePoint.localPosition = newPosition;

@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8bbc1fce04c7c9a4f86d6f08ff6431f1, type: 3}
+  m_Name: Attack_Twins
+  m_EditorClassIdentifier: 
+  preferredShootingRange: 10
+  sightDistance: 10
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 2048
+  attackCooldown: 1
+  loseSightThreshold: 1.5
+  projectilePrefab: {fileID: 5740292498457461232, guid: 10cb9fc61e2535b4ea18aac5d636410d, type: 3}
+  projectileSpeed: 8
+  projectileSpawnOffset: 0.5
+  spreadAngle: 10
+  showDebugRays: 1

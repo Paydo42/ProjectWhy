@@ -139,7 +139,7 @@ Transform:
   m_GameObject: {fileID: 2968837417179641528}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.049, y: -0.217, z: 0}
+  m_LocalPosition: {x: -0.049, y: -0.21, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -426,7 +426,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d0beaa014c715c46a11ef46d8ccf889, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 3
+  moveSpeed: 0
   waypointReachedDistance: 0.5
   turnSpeed: 10
   avoidanceLayer:
@@ -466,6 +466,8 @@ MonoBehaviour:
   idleAnimationStateName: Enemy_Eye_Idle_Animation
   deathTriggerName: IsDeathAngel
   takeDamageTriggerName: IsTakingDamage
+  attackBoolName: IsAttacking
+  useAnimationDrivenAttack: 1
   startingState: 2
   neverReturnsToIdle: 1
   pathUpdateInterval: 0.5

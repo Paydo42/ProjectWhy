@@ -10,9 +10,8 @@ public enum EnemyStartState
 {
     StartIdle,  // The default behavior
     StartChase, // For enemies like the Devil that chase immediately
-
     StartAttack // For enemies that attack immediately upon activation
-    // You could add more later, like StartPatrol, StartFlee, etc.
+    
 }
 
 public class Enemy : MonoBehaviour, IDamageable, IEnemyMoveable, ITriggerCheckAble
@@ -24,8 +23,10 @@ public class Enemy : MonoBehaviour, IDamageable, IEnemyMoveable, ITriggerCheckAb
     public string deathTriggerName = "Die";
     [Tooltip("The exact name of the Trigger parameter for the take damage animation.")]
     public string takeDamageTriggerName = "TakeDamage";
-    // [Tooltip("The exact name of the Trigger parameter for the attack animation.")] // Uncomment if you add an attack trigger
-    // public string attackTriggerName = "Attack";
+    [Tooltip("The exact name of the Bool parameter for the attack animation.")]
+    public string attackBoolName = "IsAttacking";
+    [Tooltip("If true, this enemy uses animation-driven attacks (waits for animation event to shoot).")]
+    public bool useAnimationDrivenAttack = false;
 
     [Header("State Machine Config")]
     [SerializeField, Tooltip("Determines the initial state the enemy enters upon activation.")]
@@ -42,15 +43,18 @@ public class Enemy : MonoBehaviour, IDamageable, IEnemyMoveable, ITriggerCheckAb
      private float pathUpdateTimer = 0f;
      private bool isPathfindingActive = false; // Flag to control periodic updates
      public Vector3 currentPathfindingTarget; // Where are we trying to go?
-   // --- MODIFIED: Public getter, private setter. Set via Activate ---
+
     public GridGenerator currentRoomGridGenerator { get; private set; }
 
     [Header("Knockback Settings")]
     [SerializeField] private float defaultknockbackForce = 5f;
     [SerializeField] private float knockbackDuration = 0.2f;
     private bool isKnockedBack = false;
+
+    // Stores the last non-zero movement direction for animation blend trees
+    private Vector2 lastMoveDirection = Vector2.right; // Default facing right
    // private float maxKnockbackVelocity = 10f;
-    // --- END MODIFICATION ---
+   
 
     [Header("Combat Config")] // Header for combat-related settings
     [SerializeField, Tooltip("Layers that block this enemy's line of sight for shooting.")]
@@ -76,6 +80,7 @@ public class Enemy : MonoBehaviour, IDamageable, IEnemyMoveable, ITriggerCheckAb
     // --- Core Properties & State ---
     public GameObject OriginalPrefab { get; set; } // Used by PoolManager
     private RoomBounds parentRoom; // Reference to the room it's in (if applicable)
+    public RoomBounds ParentRoom => parentRoom; // Public getter for ScriptableObjects to access room bounds
     private bool isActivated = false; // Controls if Update/FixedUpdate run
     public EnemyStateMachine stateMachine { get; set; }
     public Enemy_Scriptable_Object enemyData; // Holds base stats like MaxHealth
@@ -107,6 +112,10 @@ public class Enemy : MonoBehaviour, IDamageable, IEnemyMoveable, ITriggerCheckAb
     public bool IsFacingRight { get; set; } = true;
     public bool IsAggroed { get; set; } = false;
     public bool IsWithInAttackDistance { get; set; } = false;
+    
+    // --- Attack Animation State ---
+    /// <summary>True when the enemy is in the middle of an attack animation</summary>
+    public bool IsAttacking { get; private set; } = false;
 
     // --- State Instances ---
     public EnemyIdleState IdleState { get; private set; }
@@ -371,6 +380,76 @@ public class Enemy : MonoBehaviour, IDamageable, IEnemyMoveable, ITriggerCheckAb
         ReturnToPoolOrDestroy();
     }
 
+    // ==========================================
+    // ATTACK ANIMATION SYSTEM
+    // ==========================================
+
+    /// <summary>
+    /// Start the attack animation. Call this when the enemy should begin attacking.
+    /// If useAnimationDrivenAttack is true, the actual attack happens via OnAttackAnimationEvent.
+    /// If false, the attack happens immediately without waiting for animation.
+    /// </summary>
+    public virtual void StartAttackAnimation()
+    {
+        if (IsAttacking) return; // Already attacking
+        
+        IsAttacking = true;
+        Debug.Log($"'{name}' started attack animation. useAnimationDrivenAttack: {useAnimationDrivenAttack}");
+        if (animator != null && !string.IsNullOrEmpty(attackBoolName))
+        {
+            animator.SetBool(attackBoolName, true);
+        }
+        
+        // If not using animation-driven attacks, perform attack immediately
+        if (!useAnimationDrivenAttack)
+        {
+            PerformAttackFromSO();
+        }
+    }
+
+    /// <summary>
+    /// Called via Animation Event during the attack animation (at the moment the attack should happen).
+    /// This is where projectiles are spawned, damage is dealt, etc.
+    /// </summary>
+    public virtual void OnAttackAnimationEvent()
+    {
+        if (!useAnimationDrivenAttack) return; // Only process if using animation-driven attacks
+        
+        Debug.Log($"[{name}] Attack animation event triggered!");
+        PerformAttackFromSO();
+    }
+
+    /// <summary>
+    /// Called via Animation Event at the END of the attack animation.
+    /// Resets the attack state so the enemy can attack again.
+    /// </summary>
+    public virtual void OnAttackAnimationComplete()
+    {
+        IsAttacking = false;
+        
+        if (animator != null && !string.IsNullOrEmpty(attackBoolName))
+        {
+            animator.SetBool(attackBoolName, false);
+        }
+        
+        Debug.Log($"[{name}] Attack animation complete.");
+    }
+
+    /// <summary>
+    /// Delegates the actual attack logic to the Attack ScriptableObject
+    /// </summary>
+    private void PerformAttackFromSO()
+    {
+        if (EnemyAttackBaseInstance != null)
+        {
+            EnemyAttackBaseInstance.PerformAttack();
+        }
+        else
+        {
+            Debug.LogWarning($"[{name}] No EnemyAttackBaseInstance assigned, cannot perform attack!");
+        }
+    }
+
      // Handles returning the object to the pool or destroying it
     private void ReturnToPoolOrDestroy() {
         // Reset kinematic/collider state before pooling/destroying if needed for reuse
@@ -502,20 +581,20 @@ public class Enemy : MonoBehaviour, IDamageable, IEnemyMoveable, ITriggerCheckAb
 
          // Determine if moving based on AgentMover's state and Rigidbody linearVelocity
          bool isMoving = agentMover != null && agentMover.canMove && RB.linearVelocity.sqrMagnitude > 0.1f;
-      //   animator.SetBool("IsWalking", isMoving);
+         animator.SetBool("IsWalking", isMoving);
 
-         // Example: Set blend tree parameters based on last move direction (if using blend tree)
-         // Assuming you have parameters like "LastMoveX", "LastMoveY"
-         // if (!isMoving) // Could reset blend tree to idle pose
-         // {
-         //    animator.SetFloat("LastMoveX", IsFacingRight ? 1 : -1); // Or based on actual last input/linearVelocity
-         //    animator.SetFloat("LastMoveY", 0);
-         // } else {
-         //    // Update based on linearVelocity or desired direction from AI
-         //    // This might need more refinement depending on your animator setup
-         //    Vector2 currentVelNorm = RB.linearVelocity.normalized;
-         //    animator.SetFloat("LastMoveX", currentVelNorm.x);
-         //    animator.SetFloat("LastMoveY", currentVelNorm.y);
-         // }
+         // Update last move direction when moving
+         if (isMoving)
+         {
+             // Store the normalized velocity as the last move direction
+             lastMoveDirection = RB.linearVelocity.normalized;
+         }
+
+         // Always set the blend tree parameters (uses last direction when idle)
+         animator.SetFloat("LastMoveX", lastMoveDirection.x);
+         animator.SetFloat("LastMoveY", lastMoveDirection.y);
     }
+
+    // Public getter if other scripts need access to last move direction
+    public Vector2 LastMoveDirection => lastMoveDirection;
 }
