@@ -400,11 +400,22 @@ public class Enemy : MonoBehaviour, IDamageable, IEnemyMoveable, ITriggerCheckAb
             animator.SetBool(attackBoolName, true);
         }
         
-        // If not using animation-driven attacks, perform attack immediately
+        // If not using animation-driven attacks, perform attack immediately and reset
         if (!useAnimationDrivenAttack)
         {
             PerformAttackFromSO();
+            // Reset IsAttacking after a short delay to allow cooldown to work
+            StartCoroutine(ResetAttackStateAfterDelay(0.2f));
         }
+    }
+    
+    /// <summary>
+    /// Resets the attack state after a delay (used when not using animation-driven attacks)
+    /// </summary>
+    private System.Collections.IEnumerator ResetAttackStateAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        OnAttackAnimationComplete();
     }
 
     /// <summary>

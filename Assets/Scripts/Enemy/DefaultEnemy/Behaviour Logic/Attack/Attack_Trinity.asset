@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b92f903a0de43b448b00e3ecdb0e8232, type: 3}
+  m_Name: Attack_Trinity
+  m_EditorClassIdentifier: 
+  preferredShootingRange: 7
+  sightDistance: 7
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 2048
+  attackCooldown: 1
+  loseSightThreshold: 1.5
+  regularProjectilePrefab: {fileID: 5740292498457461232, guid: 10cb9fc61e2535b4ea18aac5d636410d, type: 3}
+  regularProjectileSpeed: 8
+  regularSpreadAngle: 10
+  laserProjectilePrefab: {fileID: 5740292498457461232, guid: 10cb9fc61e2535b4ea18aac5d636410d, type: 3}
+  laserProjectileSpeed: 15
+  laserSpreadAngle: 0
+  projectileSpawnOffset: 0.5
+  showDebugRays: 1

@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf7648684e0aa614c9f902b53b6d1852, type: 3}
+  m_Name: Idle_TrinityPatrol
+  m_EditorClassIdentifier: 
+  sightDistance: 7
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 3072
+  waitTimeAtPoint: 1.5
+  patrolPointReachThreshold: 0.3
+  roomEdgePadding: 1
+  showDebugRays: 1
