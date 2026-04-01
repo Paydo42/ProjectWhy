@@ -25,7 +25,7 @@ MonoBehaviour:
   regularProjectilePrefab: {fileID: 5740292498457461232, guid: 10cb9fc61e2535b4ea18aac5d636410d, type: 3}
   regularProjectileSpeed: 8
   regularSpreadAngle: 10
-  laserProjectilePrefab: {fileID: 5740292498457461232, guid: 10cb9fc61e2535b4ea18aac5d636410d, type: 3}
+  laserProjectilePrefab: {fileID: 5521337182832906928, guid: ec84e20108fd83f4f832622d79dbdad6, type: 3}
   laserProjectileSpeed: 15
   laserSpreadAngle: 0
   projectileSpawnOffset: 0.5

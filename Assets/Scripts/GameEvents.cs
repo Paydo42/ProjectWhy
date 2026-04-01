@@ -4,8 +4,17 @@ using UnityEngine;
 public static class GameEvents
 {
     public delegate void TimeRewardHandler(float seconds);
+    public delegate void SpellCastHandler(float damage);
+
     public static event TimeRewardHandler OnEnemyKilled;
     public static event TimeRewardHandler OnPlayerShot;
+    public static event SpellCastHandler OnSpellCast;
+
+    public static void TriggerSpellCast(float damage)
+    {
+        OnSpellCast?.Invoke(damage);
+    }
+
     public static void TriggerEnemyKilled(float seconds)
     {
         OnEnemyKilled?.Invoke(seconds);

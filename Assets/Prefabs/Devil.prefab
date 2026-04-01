@@ -485,6 +485,8 @@ MonoBehaviour:
   idleAnimationStateName: Enemy_WraithFather_Idle_Animation
   deathTriggerName: IsDeathAngel
   takeDamageTriggerName: IsTakingDamage
+  attackBoolName: IsAttacking
+  useAnimationDrivenAttack: 0
   startingState: 1
   neverReturnsToIdle: 1
   pathUpdateInterval: 0.5

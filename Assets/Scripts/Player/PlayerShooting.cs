@@ -28,8 +28,18 @@ public class PlayerShooting : MonoBehaviour
     [Header("Piercing")]
     private int pierceCount = 0;
     
+    [Header("Homing")]
+    private bool homingEnabled = false;
+    private float homingStrength = 5f;
+    private float homingRange = 8f;
+    
     [Header("BonusDamage")]
     private float bonusDamage = 0f;
+
+    [Header("Bouncing Projectile")]
+    
+    private bool bouncingProjectileEnabled = false;
+    private int bounceCount = 0;
     
     [Header("Audio  ")]
 
@@ -74,7 +84,9 @@ public class PlayerShooting : MonoBehaviour
         if (erailScript != null)
         {
             erailScript.Initialize(erailPrefab, projectilePrefab, aimDirection, projectileSpeed, projectileCount, spreadAngle,
-                                   chainAttackEnabled, chainCount, chainRange, chainDamageMultiplier, pierceCount, bonusDamage);
+                                   chainAttackEnabled, chainCount, chainRange, chainDamageMultiplier, pierceCount, bonusDamage,
+                                   homingEnabled, homingStrength, homingRange,
+                                   bouncingProjectileEnabled, bounceCount);
         }
     }
     
@@ -115,6 +127,14 @@ public class PlayerShooting : MonoBehaviour
     public bool IsChainAttackEnabled() => chainAttackEnabled;
     public int GetChainCount() => chainCount;
     
+    public void EnableBouncingProjectiles(int bounces)
+    {
+        bouncingProjectileEnabled = true;
+        bounceCount = bounces;
+        Debug.Log($"Bouncing projectiles enabled with {bounces} bounces!");
+    }
+    public bool IsBouncingProjectileEnabled() => bouncingProjectileEnabled;
+    public int GetBounceCount() => bounceCount;
     // Fire rate methods
     public void IncreaseFireRate(float multiplier)
     {
@@ -157,6 +177,22 @@ public class PlayerShooting : MonoBehaviour
     }
     
     public float GetBonusDamage() => bonusDamage;
+    
+    // Homing methods
+    public void EnableHoming(float strength, float range)
+    {
+        homingEnabled = true;
+        homingStrength = strength;
+        homingRange = range;
+        Debug.Log($"Homing Shot enabled! Strength: {strength}, Range: {range}");
+    }
+    
+    public void DisableHoming()
+    {
+        homingEnabled = false;
+    }
+    
+    public bool IsHomingEnabled() => homingEnabled;
 
     // --- FIX: Added an Update method to handle continuous firing ---
   

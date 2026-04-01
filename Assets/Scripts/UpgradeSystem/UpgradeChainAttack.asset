@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6eb187e91dabe9448a311b17a71973b4, type: 3}
   m_Name: UpgradeChainAttack
   m_EditorClassIdentifier: 
-  chainCount: 2
+  chainCount: 1
   chainRange: 5
   chainDamageMultiplier: 0.8

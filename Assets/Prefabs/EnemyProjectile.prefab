@@ -165,8 +165,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d1f0cb7f375901b4bab6f00b82b8ee1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyStats: {fileID: 0}
   lifetime: 2
+  damage: 1
 --- !u!1 &5740292498457461232
 GameObject:
   m_ObjectHideFlags: 0
@@ -333,5 +333,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d1f0cb7f375901b4bab6f00b82b8ee1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyStats: {fileID: 0}
-  lifetime: 2
+  lifetime: 6
+  damage: 1

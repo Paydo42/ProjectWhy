@@ -10,6 +10,7 @@ public class Erail : MonoBehaviour
     [Header("Audio ")]
     [SerializeField] private AudioClip shootClip;
     private AudioSource audioSource;
+    private float DefaultSpreadAngle = 3f;
 
     private GameObject projectilePrefab;
     private Vector2 shootDirection;
@@ -31,6 +32,15 @@ public class Erail : MonoBehaviour
     
     // Damage parameters
     private float bonusDamage = 0f;
+    
+    // Homing parameters
+    private bool homingEnabled = false;
+    private float homingStrength = 5f;
+    private float homingRange = 8f;
+
+    // Bouncing parameters
+    private bool bouncingEnabled = false;
+    private int bounceCount = 0;
 
     void Awake()
     {
@@ -40,7 +50,9 @@ public class Erail : MonoBehaviour
     public void Initialize(GameObject bowPrefabRef, GameObject projectilePrefab, Vector2 shootDirection, float projectileSpeed, 
                            int projectileCount = 1, float spreadAngle = 20f,
                            bool chainEnabled = false, int chainCount = 0, float chainRange = 5f, float chainDamageMultiplier = 0.8f,
-                           int pierceCount = 0, float bonusDamage = 0f)
+                           int pierceCount = 0, float bonusDamage = 0f,
+                           bool homingEnabled = false, float homingStrength = 5f, float homingRange = 8f,
+                           bool bouncingEnabled = false, int bounceCount = 0)
     {
         this.originalPrefab = bowPrefabRef;
         this.projectilePrefab = projectilePrefab;
@@ -60,6 +72,15 @@ public class Erail : MonoBehaviour
         
         // Damage settings
         this.bonusDamage = bonusDamage;
+        
+        // Homing settings
+        this.homingEnabled = homingEnabled;
+        this.homingStrength = homingStrength;
+        this.homingRange = homingRange;
+
+        // Bouncing settings
+        this.bouncingEnabled = bouncingEnabled;
+        this.bounceCount = bounceCount;
 
         // Restart the shoot animation (needed for pooled objects)
         Animator animator = GetComponent<Animator>();
@@ -82,8 +103,11 @@ public class Erail : MonoBehaviour
         
         if (projectileCount == 1)
         {
-            // Single projectile
-            SpawnProjectile(shootDirection, baseAngle);
+            // Single projectile with small default spread
+            float offset = Random.Range(-DefaultSpreadAngle, DefaultSpreadAngle);
+            float finalAngle = baseAngle + offset;
+            Vector2 dir = new(Mathf.Cos(finalAngle * Mathf.Deg2Rad), Mathf.Sin(finalAngle * Mathf.Deg2Rad));
+            SpawnProjectile(dir, finalAngle);
         }
         else
         {
@@ -130,6 +154,18 @@ public class Erail : MonoBehaviour
             if (pierceCount > 0)
             {
                 projectile.SetPiercing(pierceCount);
+            }
+            
+            // Apply homing if enabled
+            if (homingEnabled)
+            {
+                projectile.SetHoming(homingStrength, homingRange);
+            }
+            
+            // Apply bouncing if enabled
+            if (bouncingEnabled && bounceCount > 0)
+            {
+                projectile.SetBouncing(bounceCount);
             }
         }
     }

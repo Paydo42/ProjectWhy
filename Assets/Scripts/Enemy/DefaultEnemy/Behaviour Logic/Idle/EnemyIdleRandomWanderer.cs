@@ -1,22 +1,21 @@
 // Full Path: Assets/Scripts/Enemy/DefaultEnemy/Behaviour Logic/Idle/EnemyIdleRandomWanderer.cs
 using UnityEngine;
-using System.Collections.Generic; // Keep for List if needed elsewhere, though not directly used now
+using System.Collections.Generic; 
 
 [CreateAssetMenu(fileName = "EnemyIdleRandomWanderer", menuName = "Enemy Logic/Idle Logic/Random Wanderer")]
 public class EnemyIdleRandomWanderer : EnemyIdleSOBase
 {
     [SerializeField] private float wanderRadius = 3f; // Renamed from RandomMovementRange for clarity
-    // REMOVED: RandomMovementSpeed - AgentMover controls speed
     [SerializeField] private float waitTimeAtDestination = 2.0f; // How long to wait after reaching a point
     [SerializeField] private float maxWanderTime = 10.0f; // Max time before picking a new point even if not reached
-
+    
     // Runtime variables
     private float currentWaitTimer = 0f;
     private float currentWanderTimer = 0f;
     private bool isWaiting = false;
     private GridGenerator currentRoomGridGenerator; // Need this to find valid nodes
 
-    // Variables from original script (keep if needed for other logic, otherwise remove)
+    // Variables from old script (keep if needed for other logic, otherwise remove)
     // private Vector3 _targetPosition;
     // private Vector3 _direction;
 
@@ -24,14 +23,12 @@ public class EnemyIdleRandomWanderer : EnemyIdleSOBase
     public override void Initialize(GameObject gameObject, Enemy enemy)
     {
         base.Initialize(gameObject, enemy);
-        // We need the grid generator reference from the Enemy script
-        currentRoomGridGenerator = enemy.GetComponentInParent<GridGenerator>(); // Or however Enemy script gets it
-         if (currentRoomGridGenerator == null) Debug.LogError($"EnemyIdleRandomWanderer: Could not find GridGenerator for {enemy.name}", enemy);
     }
 
     public override void DoEnterLogic()
     {
         base.DoEnterLogic();
+        currentRoomGridGenerator = enemy.currentRoomGridGenerator;
         enemy.StopPathfinding(); // Ensure stopped from previous state
         isWaiting = false;
         currentWaitTimer = 0f;

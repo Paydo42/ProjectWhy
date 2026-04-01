@@ -10,8 +10,9 @@ public class Upgrade : MonoBehaviour
     [Header("Selection Settings")]
     public float selectionRadius = 1.5f;
     public static Upgrade upgradeInRange;
-    public bool PlayerInRange { get; private set; }
+    public bool PlayerInRange { get; set; }
     private Animator animator;
+    private bool selected;
     public RoomBounds roomBounds;
    
     void Awake()
@@ -67,6 +68,9 @@ public class Upgrade : MonoBehaviour
 
     public void SelectThisUpgrade()
     {
+        if (selected) return;
+        selected = true;
+
         // Apply upgrade to player
         GameObject player = GameObject.FindWithTag("Player");
         if (player != null) ApplyUpgrade(player);
@@ -77,8 +81,9 @@ public class Upgrade : MonoBehaviour
         // Play selection animation
         animator.SetTrigger("Selected");
 
-        // Disable collider to prevent multiple interactions
+        // Disable collider and clear static reference to prevent re-selection
         GetComponent<Collider2D>().enabled = false;
+        if (upgradeInRange == this) upgradeInRange = null;
         
     }
     

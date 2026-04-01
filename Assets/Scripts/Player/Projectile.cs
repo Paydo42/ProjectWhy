@@ -5,6 +5,7 @@ public class Projectile : MonoBehaviour
     public float speed = 10f;
     public float lifetime = 2f;
     public float damage = 1f;
+    private float baseDamage; // Store base damage to reset on pool reuse
     [Header("Audio")]
     public AudioClip hitSound;
     
@@ -18,6 +19,16 @@ public class Projectile : MonoBehaviour
     [Header("Piercing")]
     private int pierceCount = 0; // How many enemies this projectile can pierce through
     private int pierceRemaining = 0;
+    
+    [Header("Homing")]
+    private bool homingEnabled = false;
+    private float homingStrength = 5f;   // How fast the projectile turns toward the target
+    private float homingRange = 8f;      // Detection radius for finding a target
+    private Transform homingTarget;
+
+    [Header("Bouncing")]
+    private bool bouncingEnabled = false;
+    private int bouncesRemaining = 0;
 
     public GameObject OriginalPrefab { get; private set; }
     private Rigidbody2D rb;
@@ -25,6 +36,7 @@ public class Projectile : MonoBehaviour
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        baseDamage = damage; // Store the base damage from prefab
     }
 
     void OnEnable()
@@ -36,6 +48,8 @@ public class Projectile : MonoBehaviour
     public void Initialize(GameObject prefab)
     {
         OriginalPrefab = prefab;
+        // Reset damage to base value (prevents stacking on pooled projectiles)
+        damage = baseDamage;
         // Reset chain state for pooled projectiles
         chainEnabled = false;
         chainsRemaining = 0;
@@ -43,6 +57,12 @@ public class Projectile : MonoBehaviour
         // Reset piercing state
         pierceCount = 0;
         pierceRemaining = 0;
+        // Reset homing state
+        homingEnabled = false;
+        homingTarget = null;
+        // Reset bouncing state
+        bouncingEnabled = false;
+        bouncesRemaining = 0;
     }
     
     /// <summary>
@@ -72,6 +92,73 @@ public class Projectile : MonoBehaviour
     {
         damage += bonus;
     }
+   
+    public void SetHoming(float strength, float range)
+    {
+        homingEnabled = true;
+        homingStrength = strength;
+        homingRange = range;
+        homingTarget = null; // Will be found in Update
+        Debug.Log($"Homing enabled on projectile! Strength: {homingStrength}, Range: {homingRange}");
+    }
+
+    public void SetBouncing(int bounceCount)
+    {
+        bouncingEnabled = true;
+        bouncesRemaining = bounceCount;
+    }
+
+    void Update()
+    {
+        if (!homingEnabled || rb == null) return;
+        
+        // Find or re-acquire a target
+        if (homingTarget == null || !homingTarget.gameObject.activeInHierarchy)
+        {
+            homingTarget = FindNearestEnemy();
+        }
+        
+        if (homingTarget != null)
+        {
+            Vector2 direction = ((Vector2)homingTarget.position - (Vector2)transform.position).normalized;
+            Vector2 currentVelocity = rb.linearVelocity;
+            float currentSpeed = currentVelocity.magnitude;
+            
+            // Smoothly steer toward the target
+            Vector2 desiredVelocity = direction * currentSpeed;
+            Vector2 steering = Vector2.Lerp(currentVelocity, desiredVelocity, homingStrength * Time.deltaTime);
+            rb.linearVelocity = steering.normalized * currentSpeed;
+            
+            // Rotate sprite to face movement direction
+            float angle = Mathf.Atan2(rb.linearVelocity.y, rb.linearVelocity.x) * Mathf.Rad2Deg;
+            transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+        }
+    }
+    
+    private Transform FindNearestEnemy()
+    {
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+        Transform closest = null;
+        float closestDist = float.MaxValue;
+        
+        foreach (GameObject enemyObj in enemies)
+        {
+            if (!enemyObj.activeInHierarchy) continue;
+            Enemy enemy = enemyObj.GetComponent<Enemy>();
+            if (enemy == null || enemy.CurrentHealth <= 0) continue;
+            
+            float dist = Vector2.Distance(transform.position, enemyObj.transform.position);
+            if (dist > homingRange) continue; // Outside homing range
+            
+            if (dist < closestDist)
+            {
+                closestDist = dist;
+                closest = enemyObj.transform;
+                Debug.Log($"Homing projectile found new target: {closest.name} at distance {closestDist}");
+            }
+        }
+        return closest;
+    }
 
     // --- THE MAIN FIX ---
     // This new function handles both movement and rotation.
@@ -88,8 +175,20 @@ public class Projectile : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        IDamageable damageable = other.GetComponent<IDamageable>();
-        if (damageable != null && other.CompareTag("Enemy"))
+        // Bounce off walls
+        if (other.gameObject.layer == LayerMask.NameToLayer("Walls"))
+        {
+            if (bouncingEnabled && bouncesRemaining > 0)
+            {
+                BounceOffWall();
+                return;
+            }
+            ReturnToPool();
+            return;
+        }
+
+        IDamageable damageable = other.GetComponentInParent<IDamageable>();
+        if (damageable != null && (other.CompareTag("Enemy") || other.CompareTag("Boss")))
         {
             damageable.TakeDamage(damage);
             Enemy enemyScript = other.GetComponent<Enemy>();
@@ -121,6 +220,34 @@ public class Projectile : MonoBehaviour
         }
         // Return to the pool immediately upon hitting anything
         ReturnToPool();
+    }
+
+    private void BounceOffWall()
+    {
+        bouncesRemaining--;
+        Vector2 velocity = rb.linearVelocity;
+        float speed = velocity.magnitude;
+
+        // Raycast backward along velocity to find the wall normal
+        int wallLayer = LayerMask.GetMask("Walls");
+        RaycastHit2D hit = Physics2D.Raycast(
+            (Vector2)transform.position - velocity.normalized * 0.5f,
+            velocity.normalized, 1.5f, wallLayer);
+
+        Vector2 reflected;
+        if (hit.collider != null)
+        {
+            reflected = Vector2.Reflect(velocity, hit.normal).normalized * speed;
+        }
+        else
+        {
+            // Fallback: reverse direction
+            reflected = -velocity;
+        }
+
+        rb.linearVelocity = reflected;
+        float angle = Mathf.Atan2(reflected.y, reflected.x) * Mathf.Rad2Deg;
+        transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
     }
     
     private void TryChainToNextEnemy(Transform hitEnemy)

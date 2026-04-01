@@ -466,10 +466,14 @@ MonoBehaviour:
   idleAnimationStateName: Enemy_Angel_Idle_Animation
   deathTriggerName: IsDeathAngel
   takeDamageTriggerName: IsTakingDamage
+  attackBoolName: IsAttacking
+  useAnimationDrivenAttack: 0
   startingState: 2
   neverReturnsToIdle: 1
   pathUpdateInterval: 0.5
   currentPathfindingTarget: {x: 0, y: 0, z: 0}
+  defaultknockbackForce: 5
+  knockbackDuration: 0.2
   lineOfSightMask:
     serializedVersion: 2
     m_Bits: 2048

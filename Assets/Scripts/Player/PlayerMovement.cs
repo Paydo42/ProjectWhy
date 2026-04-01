@@ -43,6 +43,13 @@ public class PlayerMovement : MonoBehaviour
         if (context.performed)
         {
             Debug.Log("Interact action performed");
+
+            // Boss door gets first priority so encounter setup starts immediately.
+            if (BossDoorEncounterTrigger.TryUseCurrentDoor())
+            {
+                return;
+            }
+
             // Check if an upgrade is in range
             if (Upgrade.upgradeInRange != null)
             {

@@ -13,7 +13,5 @@ MonoBehaviour:
   m_Name: Chamber1
   m_EditorClassIdentifier: 
   enemiesToSpawn:
-  - enemyPrefab: {fileID: 6750361400534454914, guid: dfcc72add755bd948af76c7eb0ea7b99, type: 3}
-    position: {x: 0, y: 5}
-  - enemyPrefab: {fileID: 6750361400534454914, guid: 66f4032bbb3832a419f8622126a78f8a, type: 3}
-    position: {x: 0, y: -3}
+  - enemyPrefab: {fileID: 650461236399189384, guid: 4292829a019537143b9fd0ab47380dfe, type: 3}
+    position: {x: 0, y: 0}
