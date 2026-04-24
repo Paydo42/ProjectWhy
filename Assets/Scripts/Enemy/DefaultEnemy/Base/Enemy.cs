@@ -99,6 +99,7 @@ public class Enemy : MonoBehaviour, IDamageable, IEnemyMoveable, ITriggerCheckAb
     // --- AI Components (Context Steering) ---
     public AIData aiData { get; private set; }
     public AgentMover agentMover { get; private set; }
+    public CardinalAgentMover cardinalMover { get; private set; }
   /*  public SeekBehaviour seekBehaviour { get; private set; }
     public CircleTargetBehaviour circleTargetBehaviour { get; private set; }
     public ObstacleAvoidanceBehaviour obstacleAvoidanceBehaviour { get; private set; }
@@ -176,23 +177,13 @@ public class Enemy : MonoBehaviour, IDamageable, IEnemyMoveable, ITriggerCheckAb
             avoidanceCollider = MainCollider;
         }
 
-        // Setup Trigger Check Components
+        // Setup Trigger Check Components (optional — some enemies like Charger handle detection themselves)
         AggroCheck = GetComponentInChildren<EnemyAggroCheck>();
-        if (AggroCheck == null)
-        {
-             Debug.LogError($"'{gameObject.name}': Missing 'EnemyAggroCheck' component/script.", this);
-        }
-
         AttackDistanceCheck = GetComponentInChildren<EnemyAttacktingDistanceCheck>();
-        if (AttackDistanceCheck == null)
-        {
-            Debug.LogError($"'{gameObject.name}': Missing 'EnemyAttacktingDistanceCheck' component/script.", this);
-        }
 
        
-         // Validate essential AI components
-       //  if(aiData == null) Debug.LogError($"'{gameObject.name}': Missing AIData component!", this);
-         if(agentMover == null) Debug.LogError($"'{gameObject.name}': Missing AgentMover component!", this);
+         // AgentMover is optional — some enemies (e.g. Charger) use CardinalAgentMover instead
+         if (agentMover == null) cardinalMover = GetComponent<CardinalAgentMover>();
     }
 
     public virtual void Update()
@@ -518,10 +509,10 @@ public class Enemy : MonoBehaviour, IDamageable, IEnemyMoveable, ITriggerCheckAb
     {
         isKnockedBack = true;
 
-        if ( agentMover != null)
-        {
+        if (agentMover != null)
             agentMover.canMove = false; // Disable movement during knockback
-        }
+        if (cardinalMover != null)
+            cardinalMover.canMove = false;
 
         RB.linearVelocity = Vector2.zero; // Reset current velocity
         RB.AddForce(direction * force, ForceMode2D.Impulse);
@@ -530,9 +521,10 @@ public class Enemy : MonoBehaviour, IDamageable, IEnemyMoveable, ITriggerCheckAb
 
         RB.linearVelocity = Vector2.zero; // Stop movement after knockback
         isKnockedBack = false;
-        if (agentMover != null && isActivated)
+        if (isActivated)
         {
-            agentMover.canMove = true; // Re-enable movement
+            if (agentMover != null) agentMover.canMove = true;
+            if (cardinalMover != null) cardinalMover.canMove = true;
         }
         Debug.Log($"'{name}' knockback ended.");
     }
@@ -590,8 +582,8 @@ public class Enemy : MonoBehaviour, IDamageable, IEnemyMoveable, ITriggerCheckAb
     {
          if (animator == null || RB == null) return;
 
-         // Determine if moving based on AgentMover's state and Rigidbody linearVelocity
-         bool isMoving = agentMover != null && agentMover.canMove && RB.linearVelocity.sqrMagnitude > 0.1f;
+         // Determine if moving — works for both AgentMover and CardinalAgentMover
+         bool isMoving = RB.linearVelocity.sqrMagnitude > 0.1f;
          animator.SetBool("IsWalking", isMoving);
 
          // Update last move direction when moving

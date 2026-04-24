@@ -1,62 +1,53 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "ChargerAttack", menuName = "Enemy Logic/Attack Logic/Charger Attack")]
 public class ChargerAttackBehavior : EnemyAttackSOBase
 {
-    [Header("Charge Settings")]
-    [SerializeField] private float chargeSpeed = 8f;
-    [SerializeField] private float normalSpeed = 3f;
-    [SerializeField] private float arrivalThreshold = 0.5f;
+    public override bool ManagesOwnTransitions => true;
 
-    [Header("Ray Scan Settings")]
+    [Header("Charge Settings")]
+    [SerializeField] private float chargeSpeed = 10f;
+    [SerializeField] private float approachSpeed = 3f;
+    [SerializeField] private float wallCheckDistance = 0.7f;
+    [SerializeField] private float arrivalDistance = 0.75f;
+
+    [Header("Approach Redirect (unpredictability)")]
+    [SerializeField] private float minRedirectInterval = 0.4f;
+    [SerializeField] private float maxRedirectInterval = 1.2f;
+
+    [Header("Scan Settings")]
+    [SerializeField] private float scanPauseDuration = 0.3f;
     [SerializeField] private float rayDistance = 15f;
-    [SerializeField] private float cardinalChargeDistance = 10f;
     [SerializeField] private LayerMask obstacleLayer;
     [SerializeField] private LayerMask playerLayer;
 
-    [Header("Timing")]
-    [SerializeField] private float scanPauseDuration = 0.4f;
-    [SerializeField] private float postChargeDelay = 0.2f;
-
-    private enum ChargerState { ChargingToTarget, Scanning, ChargingCardinal }
+    // Charging   = fast cardinal dash until wall
+    // Scanning   = brief pause + 3 rays (forward, left, right — not behind)
+    // Approaching = normal speed cardinal walk toward player
+    private enum ChargerState { Charging, Scanning, Approaching }
 
     private ChargerState currentState;
-    private Vector3 chargeTarget;
+    private Vector2 chargeDirection;
     private float scanTimer;
-    private float originalSpeed;
-    private bool hasStoredSpeed;
-
-    private static readonly Vector2[] cardinalDirs =
-    {
-        Vector2.up, Vector2.down, Vector2.left, Vector2.right
-    };
+    private float redirectTimer;
+    private float nextRedirectTime;
 
     public override void DoEnterLogic()
     {
         base.DoEnterLogic();
 
-        // Store and override speed
-        if (enemy.agentMover != null && !hasStoredSpeed)
-        {
-            originalSpeed = enemy.agentMover.moveSpeed;
-            hasStoredSpeed = true;
-        }
+        if (enemy.cardinalMover != null)
+            enemy.cardinalMover.canMove = true;
 
-        // Record player's current position as the charge target
-        chargeTarget = playerTransform.position;
-        StartChargeTo(chargeTarget);
+        chargeDirection = CardinalToward(playerTransform.position);
+        BeginCharge(chargeDirection);
     }
 
     public override void DoExitLogic()
     {
-        // Restore original speed
-        if (enemy.agentMover != null && hasStoredSpeed)
-        {
-            enemy.agentMover.moveSpeed = originalSpeed;
-        }
-        enemy.StopPathfinding();
         base.DoExitLogic();
+        if (enemy.cardinalMover != null)
+            enemy.cardinalMover.StopMovement();
     }
 
     public override void DoFrameUpdateLogic()
@@ -65,168 +56,157 @@ public class ChargerAttackBehavior : EnemyAttackSOBase
 
         switch (currentState)
         {
-            case ChargerState.ChargingToTarget:
-            case ChargerState.ChargingCardinal:
+            case ChargerState.Charging:
                 UpdateCharging();
                 break;
-
+            case ChargerState.Approaching:
+                UpdateApproaching();
+                break;
             case ChargerState.Scanning:
                 UpdateScanning();
                 break;
         }
     }
 
-    // ── Charging ────────────────────────────────────────────────────────
+    // ── Charge ──────────────────────────────────────────────────────────
 
-    private void StartChargeTo(Vector3 target)
+    private void BeginCharge(Vector2 cardinalDir)
     {
-        chargeTarget = target;
-        currentState = ChargerState.ChargingToTarget;
+        currentState = ChargerState.Charging;
+        chargeDirection = cardinalDir;
 
-        if (enemy.agentMover != null)
-            enemy.agentMover.moveSpeed = chargeSpeed;
-
-        enemy.RequestPath(chargeTarget);
-        if (enemy.agentMover != null)
-            enemy.agentMover.canMove = true;
-    }
-
-    private void StartCardinalCharge(Vector2 direction)
-    {
-        // Target is far in the cardinal direction; walls/grid will stop it naturally
-        Vector3 target = enemy.transform.position + (Vector3)(direction * cardinalChargeDistance);
-
-        // Snap to nearest valid grid node so pathfinding works
-        if (enemy.currentRoomGridGenerator != null)
+        if (enemy.cardinalMover != null)
         {
-            Node node = enemy.currentRoomGridGenerator.GetNodeFromWorldPoint(target);
-            if (node != null && !node.isObstacle)
-                target = node.transform.position;
-            else
-                target = FindFarthestValidNodeInDirection(direction);
+            enemy.cardinalMover.moveSpeed = chargeSpeed;
+            enemy.cardinalMover.SetDirection(cardinalDir);
+            enemy.cardinalMover.canMove = true;
         }
-
-        chargeTarget = target;
-        currentState = ChargerState.ChargingCardinal;
-
-        if (enemy.agentMover != null)
-            enemy.agentMover.moveSpeed = chargeSpeed;
-
-        enemy.RequestPath(chargeTarget);
-        if (enemy.agentMover != null)
-            enemy.agentMover.canMove = true;
     }
 
     private void UpdateCharging()
     {
-        bool arrived = false;
-
-        // Check if AgentMover finished its path
-        if (enemy.agentMover != null && !enemy.agentMover.isFollowingPath)
-            arrived = true;
-
-        // Also check distance as fallback
-        float dist = Vector2.Distance(enemy.transform.position, chargeTarget);
-        if (dist <= arrivalThreshold)
-            arrived = true;
-
-        if (arrived)
+        // Stop when the charge direction hits a wall
+        if (IsWallInDirection(chargeDirection))
         {
-            enemy.StopPathfinding();
-            if (enemy.agentMover != null)
-                enemy.agentMover.moveSpeed = normalSpeed;
-
-            // Enter scanning state
+            if (enemy.cardinalMover != null) enemy.cardinalMover.StopMovement();
             currentState = ChargerState.Scanning;
             scanTimer = 0f;
         }
     }
 
-    // ── Scanning ────────────────────────────────────────────────────────
+    // ── Approach ────────────────────────────────────────────────────────
+
+    private void BeginApproach(Vector2 cardinalDir)
+    {
+        currentState = ChargerState.Approaching;
+        chargeDirection = cardinalDir;
+        redirectTimer = 0f;
+        nextRedirectTime = Random.Range(minRedirectInterval, maxRedirectInterval);
+
+        if (enemy.cardinalMover != null)
+        {
+            enemy.cardinalMover.moveSpeed = approachSpeed;
+            enemy.cardinalMover.SetDirection(cardinalDir);
+            enemy.cardinalMover.canMove = true;
+        }
+    }
+
+    private void UpdateApproaching()
+    {
+        Vector2 forward = chargeDirection;
+        if (forward.sqrMagnitude < 0.01f) forward = Vector2.right;
+
+        // Player directly ahead — begin new charge immediately
+        if (CastRayForPlayer(forward))
+        {
+            BeginCharge(CardinalToward(playerTransform.position));
+            return;
+        }
+
+        // Wall ahead OR close enough to player — stop and scan
+        if (IsWallInDirection(chargeDirection) ||
+            Vector2.Distance(enemy.transform.position, playerTransform.position) <= arrivalDistance + 1f)
+        {
+            if (enemy.cardinalMover != null) enemy.cardinalMover.StopMovement();
+            currentState = ChargerState.Scanning;
+            scanTimer = 0f;
+            return;
+        }
+
+        // Random redirect — re-pick a cardinal toward the player to be unpredictable
+        redirectTimer += Time.deltaTime;
+        if (redirectTimer >= nextRedirectTime)
+        {
+            redirectTimer = 0f;
+            nextRedirectTime = Random.Range(minRedirectInterval, maxRedirectInterval);
+
+            Vector2 newDir = CardinalToward(playerTransform.position);
+            if (!IsWallInDirection(newDir))
+            {
+                chargeDirection = newDir;
+                if (enemy.cardinalMover != null)
+                    enemy.cardinalMover.SetDirection(newDir);
+            }
+        }
+    }
+
+    // ── 3-Ray Scan (forward, left, right — NOT behind) ──────────────────
 
     private void UpdateScanning()
     {
         scanTimer += Time.deltaTime;
         if (scanTimer < scanPauseDuration) return;
 
-        // Shoot 4 cardinal rays to find the player
-        Vector2 hitDirection = Vector2.zero;
-        bool foundPlayer = false;
+        Vector2 forward = chargeDirection;
+        if (forward.sqrMagnitude < 0.01f) forward = Vector2.right;
 
-        foreach (Vector2 dir in cardinalDirs)
+        Vector2 left  = new Vector2(-forward.y, forward.x);   // 90° left
+        Vector2 right = new Vector2(forward.y, -forward.x);   // 90° right
+
+        if (CastRayForPlayer(forward) || CastRayForPlayer(left) || CastRayForPlayer(right))
         {
-            RaycastHit2D hit = Physics2D.Raycast(
-                enemy.transform.position, dir, rayDistance, playerLayer | obstacleLayer);
-
-            if (hit.collider != null && hit.collider.CompareTag("Player"))
-            {
-                hitDirection = dir;
-                foundPlayer = true;
-                break;
-            }
-        }
-
-        if (foundPlayer)
-        {
-            // Ray found the player — charge in that cardinal direction
-            StartCardinalCharge(hitDirection);
+            // Hit player — charge in cardinal direction toward them
+            BeginCharge(CardinalToward(playerTransform.position));
         }
         else
         {
-            // No ray hit — pick the cardinal direction closest to the player
-            Vector2 toPlayer = (Vector2)(playerTransform.position - enemy.transform.position);
-            Vector2 bestDir = GetClosestCardinalDirection(toPlayer);
-            StartCardinalCharge(bestDir);
+            // No hit — approach player at normal speed, scan again on arrival
+            BeginApproach(CardinalToward(playerTransform.position));
         }
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────
 
-    private Vector2 GetClosestCardinalDirection(Vector2 toPlayer)
+    private bool IsWallInDirection(Vector2 dir)
     {
-        Vector2 best = Vector2.right;
-        float bestDot = float.MinValue;
-
-        foreach (Vector2 dir in cardinalDirs)
-        {
-            float dot = Vector2.Dot(toPlayer.normalized, dir);
-            if (dot > bestDot)
-            {
-                bestDot = dot;
-                best = dir;
-            }
-        }
-
-        return best;
+        Vector2 origin = (Vector2)enemy.transform.position + dir * 0.5f;
+        RaycastHit2D hit = Physics2D.Raycast(origin, dir, wallCheckDistance, obstacleLayer);
+        return hit.collider != null;
     }
 
-    private Vector3 FindFarthestValidNodeInDirection(Vector2 direction)
+    private bool CastRayForPlayer(Vector2 direction)
     {
-        // Walk along the cardinal direction and find the last valid node
-        GridGenerator grid = enemy.currentRoomGridGenerator;
-        if (grid == null) return enemy.transform.position;
+        Vector2 origin = (Vector2)enemy.transform.position + direction * 0.6f;
+        RaycastHit2D hit = Physics2D.Raycast(
+            origin, direction, rayDistance, playerLayer | obstacleLayer);
+        Debug.DrawRay(origin, direction * rayDistance, Color.yellow);
+        return hit.collider != null && hit.collider.CompareTag("Player");
+    }
 
-        Vector3 bestPos = enemy.transform.position;
-        float step = 1f;
-
-        for (float d = step; d <= cardinalChargeDistance; d += step)
-        {
-            Vector3 testPos = enemy.transform.position + (Vector3)(direction * d);
-            Node node = grid.GetNodeFromWorldPoint(testPos);
-
-            if (node == null || node.isObstacle)
-                break;
-
-            bestPos = node.transform.position;
-        }
-
-        return bestPos;
+    private Vector2 CardinalToward(Vector2 target)
+    {
+        Vector2 dir = (target - (Vector2)enemy.transform.position);
+        if (dir.sqrMagnitude < 0.0001f) return Vector2.right;
+        if (Mathf.Abs(dir.x) >= Mathf.Abs(dir.y))
+            return dir.x >= 0 ? Vector2.right : Vector2.left;
+        else
+            return dir.y >= 0 ? Vector2.up : Vector2.down;
     }
 
     public override void ResetValues()
     {
         base.ResetValues();
-        currentState = ChargerState.ChargingToTarget;
+        currentState = ChargerState.Charging;
         scanTimer = 0f;
     }
 }

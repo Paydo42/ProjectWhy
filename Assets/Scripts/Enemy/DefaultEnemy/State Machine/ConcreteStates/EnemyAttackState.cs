@@ -52,17 +52,19 @@ public class EnemyAttackState : EnemyState
 
 
         // --- Check for State Transitions (remains in state) ---
-        float distanceToPlayerSqr = (playerTransform.position - enemy.transform.position).sqrMagnitude;
-        // Still need preferredShootingRange from the SO to check the exit condition
-        float preferredRange = attackDataSO.preferredShootingRange;
-        float bufferedRangeSqr = Mathf.Pow(preferredRange + exitAttackRangeBuffer, 2);
-
-        if (distanceToPlayerSqr > bufferedRangeSqr)
+        // Skip range check if the attack SO handles its own movement/transitions (e.g. Charger)
+        if (!attackDataSO.ManagesOwnTransitions)
         {
-             Debug.Log($"AttackState ({enemy.name}): Player out of buffered range (Dist^2 {distanceToPlayerSqr:F2} > Buffered^2 {bufferedRangeSqr:F2}), changing to Chase State.");
-            enemy.stateMachine.ChangeState(enemy.ChaseState);
-            
-            return; // Exit early if transitioning
+            float distanceToPlayerSqr = (playerTransform.position - enemy.transform.position).sqrMagnitude;
+            float preferredRange = attackDataSO.preferredShootingRange;
+            float bufferedRangeSqr = Mathf.Pow(preferredRange + exitAttackRangeBuffer, 2);
+
+            if (distanceToPlayerSqr > bufferedRangeSqr)
+            {
+                Debug.Log($"AttackState ({enemy.name}): Player out of buffered range, changing to Chase State.");
+                enemy.stateMachine.ChangeState(enemy.ChaseState);
+                return;
+            }
         }
         // --- End Transitions ---
     }

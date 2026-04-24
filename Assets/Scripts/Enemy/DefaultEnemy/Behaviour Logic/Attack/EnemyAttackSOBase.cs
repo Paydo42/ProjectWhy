@@ -8,6 +8,8 @@ public class EnemyAttackSOBase : ScriptableObject
 {
     // References set during initialization by the Enemy script
     [SerializeField] public float preferredShootingRange = 7f;
+    /// <summary>If true, the attack SO handles its own movement/transitions — skip the range-to-chase check in EnemyAttackState.</summary>
+    public virtual bool ManagesOwnTransitions => false;
     protected Enemy enemy;
     protected Transform transform;
     protected GameObject gameObject;

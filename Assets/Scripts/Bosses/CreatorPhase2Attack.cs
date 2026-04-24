@@ -12,12 +12,14 @@ public class CreatorPhase2Attack : MonoBehaviour
     [Header("Spiral Attack")]
     [SerializeField] private float spiralFireRate = 0.06f;
     [SerializeField] private int spiralBulletsPerRotation = 36;
-    [SerializeField] private int spiralArms = 4;
+    [SerializeField] private int minSprialArms = 2;
+     [SerializeField] private int maxSpiralArms = 5;
     [SerializeField] private float spiralDuration = 6f;
 
     [Header("Burst Attack")]
     [SerializeField] private int burstBulletCount = 20;
-    [SerializeField] private int burstWaves = 4;
+    [SerializeField] private int minBurstWaves = 3;
+    [SerializeField] private int maxBurstWaves = 5;
     [SerializeField] private float burstWaveDelay = 0.5f;
 
     [Header("Aimed Attack")]
@@ -41,6 +43,7 @@ public class CreatorPhase2Attack : MonoBehaviour
     private Transform player;
     private Rigidbody2D playerRb;
     private AgentMover agentMover;
+    private Transform bossTransform;
     private Vector2 spawnPosition;
 
     private Coroutine attackRoutine;
@@ -60,9 +63,8 @@ public class CreatorPhase2Attack : MonoBehaviour
         if (gridGenerator == null)
             gridGenerator = FindFirstObjectByType<GridGenerator>();
 
-        spawnPosition = transform.parent != null
-            ? (Vector2)transform.parent.position
-            : (Vector2)transform.position;
+        bossTransform = transform.parent != null ? transform.parent : transform;
+        spawnPosition = bossTransform.position;
 
         // Movement and attacks run in parallel
         movementRoutine = StartCoroutine(WanderLoop());
@@ -137,7 +139,7 @@ public class CreatorPhase2Attack : MonoBehaviour
         float angleStep   = 360f / spiralBulletsPerRotation;
         float currentAngle = 0f;
         int totalShots    = Mathf.RoundToInt(spiralDuration / spiralFireRate);
-
+        int spiralArms    = Random.Range(minSprialArms, maxSpiralArms + 1);
         for (int i = 0; i < totalShots; i++)
         {
             for (int arm = 0; arm < spiralArms; arm++)
@@ -154,7 +156,7 @@ public class CreatorPhase2Attack : MonoBehaviour
     private IEnumerator BurstAttack()
     {
         float angleOffset = 0f;
-
+        int burstWaves = Random.Range(minBurstWaves, maxBurstWaves + 1);
         for (int wave = 0; wave < burstWaves; wave++)
         {
             for (int i = 0; i < burstBulletCount; i++)
@@ -174,7 +176,7 @@ public class CreatorPhase2Attack : MonoBehaviour
         {
             if (player != null)
             {
-                Vector2 dirToPlayer = ((Vector2)(player.position - transform.position)).normalized;
+                Vector2 dirToPlayer = ((Vector2)(player.position - bossTransform.position)).normalized;
                 float baseAngle = Mathf.Atan2(dirToPlayer.y, dirToPlayer.x) * Mathf.Rad2Deg;
                 float spread    = Random.Range(-aimedSpreadAngle, aimedSpreadAngle);
                 SpawnProjectile(AngleToDirection(baseAngle + spread), projectileSpeed);
@@ -201,12 +203,12 @@ public class CreatorPhase2Attack : MonoBehaviour
 
         if (playerRb != null)
         {
-            float distance   = Vector2.Distance(transform.position, player.position);
+            float distance   = Vector2.Distance(bossTransform.position, player.position);
             float travelTime = distance / oracleProjectileSpeed;
             targetPos += playerRb.linearVelocity * travelTime;
         }
 
-        return (targetPos - (Vector2)transform.position).normalized;
+        return (targetPos - (Vector2)bossTransform.position).normalized;
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────
@@ -215,7 +217,7 @@ public class CreatorPhase2Attack : MonoBehaviour
     {
         if (projectilePrefab == null || PoolManager.Instance == null) return;
 
-        GameObject bullet = PoolManager.Instance.Spawn(projectilePrefab, transform.position, Quaternion.identity);
+        GameObject bullet = PoolManager.Instance.Spawn(projectilePrefab, bossTransform.position, Quaternion.identity);
         EnemyProjectile ep = bullet.GetComponent<EnemyProjectile>();
 
         if (ep != null)

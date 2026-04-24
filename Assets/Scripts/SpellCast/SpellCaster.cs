@@ -195,12 +195,6 @@ public class SpellCaster : MonoBehaviour
         float damage = currentSpellWord.damage > 0 ? currentSpellWord.damage : defaultSpellDamage;
         DamageAllEnemiesInRoom(damage);
 
-        // Grant time bonus if any
-        if (currentSpellWord.timeBonus > 0f)
-        {
-            GameEvents.TriggerPlayerShot(currentSpellWord.timeBonus);
-        }
-
         // Trigger the game event
         GameEvents.TriggerSpellCast(damage);
 

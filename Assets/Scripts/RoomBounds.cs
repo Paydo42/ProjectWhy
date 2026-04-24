@@ -19,6 +19,10 @@ public class RoomBounds : MonoBehaviour
     [Header("Door Settings")]
     public List<Door> roomDoors = new List<Door>();
 
+    [Header("Shadow Override")]
+    [Tooltip("If set, the player's shadow sprite will change to this when entering the room.")]
+    public Sprite shadowOverrideSprite;
+
     [Header("Reward Settings")]
     public GameObject pillarPrefab;
     public int minRewards = 2;
@@ -29,6 +33,7 @@ public class RoomBounds : MonoBehaviour
 
     private List<Upgrade> currentUpgrades = new List<Upgrade>();
     private BoiCameraController cameraController;
+    private Sprite defaultShadowSprite;
 
     void Awake()
     {
@@ -59,6 +64,12 @@ public class RoomBounds : MonoBehaviour
 
         if (cameraController != null)
             cameraController.SetActiveBounds(bounds);
+
+        if (shadowOverrideSprite != null && Player.Instance.shadowRenderer != null)
+        {
+            defaultShadowSprite = Player.Instance.shadowRenderer.sprite;
+            Player.Instance.shadowRenderer.sprite = shadowOverrideSprite;
+        }
     }
 
     void Update()
@@ -79,6 +90,12 @@ public class RoomBounds : MonoBehaviour
     {
         if (!other.CompareTag("Player")) return;
         playerIsInRoom = false;
+
+        if (defaultShadowSprite != null && Player.Instance.shadowRenderer != null)
+        {
+            Player.Instance.shadowRenderer.sprite = defaultShadowSprite;
+            defaultShadowSprite = null;
+        }
 
         // Optional: If you want enemies to despawn if the player leaves mid-fight
         // ResetRoom();

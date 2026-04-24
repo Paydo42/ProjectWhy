@@ -5,6 +5,9 @@ public class Player : MonoBehaviour
     // This is the static instance that all other scripts can access
     public static Player Instance { get; private set; }
 
+    [Header("Shadow")]
+    public SpriteRenderer shadowRenderer;
+
     void Awake()
     {
         // This sets up the singleton pattern

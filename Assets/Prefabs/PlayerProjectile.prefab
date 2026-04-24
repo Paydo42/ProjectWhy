@@ -177,8 +177,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 60
   lifetime: 2
-  damage: 5
-  hitSound: {fileID: 0}
+  damage: 3
+  hitSound: {fileID: 8300000, guid: e5b7f771c53a88f48975ccc8983820b9, type: 3}
   chainRange: 5
   enemyLayer:
     serializedVersion: 2

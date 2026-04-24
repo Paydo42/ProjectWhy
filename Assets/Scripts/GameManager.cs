@@ -2,15 +2,10 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using TMPro;
 public class GameManager : MonoBehaviour
 {
     
     public static GameManager Instance { get; private set; }
-    public float remainingTime; // Example timer, adjust as needed
-    public float totalTime = 60f; // Total time for the level
-
-
     public enum GameState
     {
         MainMenu,
@@ -28,18 +23,8 @@ public class GameManager : MonoBehaviour
     private GameObject mainMenuUI;
     private GameObject pauseMenuUI;
     private GameObject gameOverUI;
-    private TextMeshProUGUI timerText;
-    private void OnEnable()
-    {
-    GameEvents.OnPlayerShot += AddTime;
-    GameEvents.OnEnemyKilled += AddTime;
-    }
 
-    private void OnDisable()
-    {
-    GameEvents.OnPlayerShot -= AddTime;
-    GameEvents.OnEnemyKilled -= AddTime;
-    }
+
 
     void Awake()
     {
@@ -80,12 +65,6 @@ public class GameManager : MonoBehaviour
         {
             SetGameState(GameState.Playing);
         }
-        // Initialize timer text if available
-        if (scene.buildIndex != 0)
-        {
-            remainingTime = totalTime; // Reset timer for new level
-            UpdateTimerDisplay();
-        }
     }
 
     void FindUIElements()
@@ -94,26 +73,6 @@ public class GameManager : MonoBehaviour
         mainMenuUI = GameObject.FindGameObjectWithTag("MainMenuUI");
         pauseMenuUI = GameObject.FindGameObjectWithTag("PauseMenuUI");
         gameOverUI = GameObject.FindGameObjectWithTag("GameOverUI");
-        GameObject timerObj = GameObject.FindGameObjectWithTag("TimerText");
-        if(timerObj != null)
-        {
-            timerText = timerObj.GetComponentInChildren<TextMeshProUGUI>();
-            
-            // Log for debugging
-            if(timerText == null)
-            {
-                Debug.LogError("TimerText object found but has no Text component!");
-            }
-            else
-            {
-                Debug.Log("TimerText found and initialized!");
-            }
-        }
-        else
-        {
-            Debug.LogError("TimerText object not found! Make sure it has 'TimerText' tag.");
-        }
-        
         // Set up button listeners
         SetupButtonListeners();
     }
@@ -170,31 +129,7 @@ public class GameManager : MonoBehaviour
                 ResumeGame();
             }
         }
-        if (currentState == GameState.Playing && !isLoadingScene)
-        {
-            // Update timer if in playing state
-           remainingTime -= Time.deltaTime;
-            UpdateTimerDisplay();
-            if (remainingTime <= 0f)
-            {
-                remainingTime = 0f;
-                GameOver();
-            }
-           
-        }
     }
-    void UpdateTimerDisplay()
-{
-    if(timerText != null)
-    {
-        // Update the timer text display
-        int minutes = Mathf.FloorToInt(remainingTime / 60);
-        int seconds = Mathf.FloorToInt(remainingTime % 60);
-        if (minutes < 0) minutes = 0; // Prevent negative minutes
-        if (seconds < 0) seconds = 0; // Prevent negative seconds
-       timerText.text = $"{minutes:00}:{seconds:00}";
-    }
-}
 
     public void SetGameState(GameState newState)
     {
@@ -239,11 +174,6 @@ public class GameManager : MonoBehaviour
                 Cursor.lockState = CursorLockMode.Locked;
                 break;
         }
-    }
-    public void AddTime(float timeToAdd)
-    {
-        remainingTime += timeToAdd; // Prevent negative time
-        UpdateTimerDisplay();
     }
 
     public void StartGame()

@@ -5,8 +5,6 @@ public class EnemyHealth : MonoBehaviour
     public Enemy_Scriptable_Object enemyStats; // Reference to the enemy stats Scriptable Object
     //public float maxHealth = 3f;
     private float currentHealth;
-    public float timeReward = 5f; // Time reward for defeating the enemy
-    
     //[Header("Visual Feedback")]
     //public Color damageColor = Color.red;
     //public float flashDuration = 0.1f;
@@ -54,11 +52,7 @@ public class EnemyHealth : MonoBehaviour
 
     private void Die()
     {
-        // Trigger time reward event
-        GameEvents.TriggerEnemyKilled(timeReward);
         // Add death effects, animations, etc.
         Destroy(gameObject);
-       // GameManager.Instance.AddTime(timeReward); // Reward player with time
-        Debug.Log($"Enemy defeated! Rewarded {timeReward} seconds.");
     }
 }

@@ -46,7 +46,7 @@ SpriteRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 650461236399189384}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 0
   m_ReceiveShadows: 0
   m_DynamicOccludee: 1
@@ -178,9 +178,9 @@ MonoBehaviour:
   onBossDefeated:
     m_PersistentCalls:
       m_Calls: []
-  phase1Root: {fileID: 6750361400534454914, guid: ab6c88444459fda4298fd0233ed1aa90, type: 3}
-  phase2Root: {fileID: 6750361400534454914, guid: 1586a24805d2e3a4d9bf6ef7561c13bd, type: 3}
-  phase3Root: {fileID: 6750361400534454914, guid: 4408c3dbdc1c7d143867143c36052ef1, type: 3}
+  phase1Root: {fileID: 7578559018412842389}
+  phase2Root: {fileID: 4917611221664577931}
+  phase3Root: {fileID: 5208713341399518876}
   transitionDuration: 1.25
   onPhase1Started:
     m_PersistentCalls:
@@ -209,12 +209,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d0beaa014c715c46a11ef46d8ccf889, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 3
+  moveSpeed: 5
   waypointReachedDistance: 0.1
   turnSpeed: 10
   avoidanceLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 1024
   avoidanceRadius: 1
   avoidanceWeight: 2
   canMove: 1
@@ -229,11 +229,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 6146581495767304982, guid: 4408c3dbdc1c7d143867143c36052ef1, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 12.243528
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6146581495767304982, guid: 4408c3dbdc1c7d143867143c36052ef1, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2.617999
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6146581495767304982, guid: 4408c3dbdc1c7d143867143c36052ef1, type: 3}
       propertyPath: m_LocalPosition.z
@@ -271,16 +271,73 @@ PrefabInstance:
       propertyPath: m_Name
       value: Phase3
       objectReference: {fileID: 0}
+    - target: {fileID: 9174222221256156721, guid: 4408c3dbdc1c7d143867143c36052ef1, type: 3}
+      propertyPath: m_SpriteSortPoint
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6750361400534454914, guid: 4408c3dbdc1c7d143867143c36052ef1, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 984812337183068683}
   m_SourcePrefab: {fileID: 100100000, guid: 4408c3dbdc1c7d143867143c36052ef1, type: 3}
 --- !u!4 &4659540680481871624 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6146581495767304982, guid: 4408c3dbdc1c7d143867143c36052ef1, type: 3}
   m_PrefabInstance: {fileID: 1578239824449084446}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &5208713341399518876 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6750361400534454914, guid: 4408c3dbdc1c7d143867143c36052ef1, type: 3}
+  m_PrefabInstance: {fileID: 1578239824449084446}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &984812337183068683
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5208713341399518876}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e71fe98a8c700343b6f2eafa947e4ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  projectilePrefab: {fileID: 5740292498457461232, guid: 10cb9fc61e2535b4ea18aac5d636410d, type: 3}
+  projectileSpeed: 5
+  projectileDamage: 1
+  delayBetweenPatterns: 1
+  spiralFireRate: 0.06
+  spiralBulletsPerRotation: 36
+  minSpiralArms: 3
+  maxSpiralArms: 6
+  spiralDuration: 6
+  burstBulletCount: 20
+  minBurstWaves: 4
+  maxBurstWaves: 6
+  burstWaveDelay: 0.5
+  aimedShotCount: 27
+  aimedShotDelay: 0.2
+  aimedSpreadAngle: 12
+  oracleShotCount: 5
+  oracleShotDelay: 0.4
+  oracleProjectileSpeed: 10
+  laserPrefab: {fileID: 5521337182832906928, guid: ec84e20108fd83f4f832622d79dbdad6, type: 3}
+  laserChargeTime: 1
+  laserDuration: 3
+  laserDamageInterval: 0.5
+  laserRange: 20
+  laserDamage: 1
+  laserTurnSpeedDegPerSec: 180
+  laserHitMask:
+    serializedVersion: 2
+    m_Bits: 128
+  gridGenerator: {fileID: 0}
+  teleportInterval: 2.5
+  minDistanceFromPlayer: 3
+  teleportVfxPrefab: {fileID: 0}
 --- !u!1001 &1842188525816507145
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -291,11 +348,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 6146581495767304982, guid: 1586a24805d2e3a4d9bf6ef7561c13bd, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 12.243528
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6146581495767304982, guid: 1586a24805d2e3a4d9bf6ef7561c13bd, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2.617999
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6146581495767304982, guid: 1586a24805d2e3a4d9bf6ef7561c13bd, type: 3}
       propertyPath: m_LocalPosition.z
@@ -338,6 +395,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1586a24805d2e3a4d9bf6ef7561c13bd, type: 3}
+--- !u!1 &4917611221664577931 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6750361400534454914, guid: 1586a24805d2e3a4d9bf6ef7561c13bd, type: 3}
+  m_PrefabInstance: {fileID: 1842188525816507145}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &5538811788791177247 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6146581495767304982, guid: 1586a24805d2e3a4d9bf6ef7561c13bd, type: 3}
@@ -353,11 +415,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 6146581495767304982, guid: ab6c88444459fda4298fd0233ed1aa90, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 12.243528
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6146581495767304982, guid: ab6c88444459fda4298fd0233ed1aa90, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2.617999
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6146581495767304982, guid: ab6c88444459fda4298fd0233ed1aa90, type: 3}
       propertyPath: m_LocalPosition.z
@@ -403,5 +465,10 @@ PrefabInstance:
 --- !u!4 &7047959582860821505 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6146581495767304982, guid: ab6c88444459fda4298fd0233ed1aa90, type: 3}
+  m_PrefabInstance: {fileID: 3783703923668930327}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &7578559018412842389 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6750361400534454914, guid: ab6c88444459fda4298fd0233ed1aa90, type: 3}
   m_PrefabInstance: {fileID: 3783703923668930327}
   m_PrefabAsset: {fileID: 0}

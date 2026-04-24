@@ -14,15 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   preferredShootingRange: 7
   chargeSpeed: 8
-  normalSpeed: 3
-  arrivalThreshold: 0.5
+  approachSpeed: 3
+  wallCheckDistance: 0.7
+  arrivalDistance: 0.75
+  minRedirectInterval: 0.4
+  maxRedirectInterval: 1.2
+  scanPauseDuration: 0.7
   rayDistance: 15
-  cardinalChargeDistance: 10
   obstacleLayer:
     serializedVersion: 2
-    m_Bits: 3072
+    m_Bits: 2048
   playerLayer:
     serializedVersion: 2
     m_Bits: 128
-  scanPauseDuration: 0.4
-  postChargeDelay: 0.2
