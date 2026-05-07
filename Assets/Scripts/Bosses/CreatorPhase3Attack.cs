@@ -36,28 +36,27 @@ public class CreatorPhase3Attack : MonoBehaviour
     [SerializeField] private float oracleProjectileSpeed = 10f;
 
     [Header("Laser Attack")]
+    [Tooltip("Prefab with a LaserBeam + Animator. Animation events drive its damage window.")]
     [SerializeField] private GameObject laserPrefab;
-    [SerializeField] private float laserChargeTime = 1f;
-    [SerializeField] private float laserDuration = 3f;
-    [SerializeField] private float laserDamageInterval = 0.5f;
-    [SerializeField] private float laserRange = 20f;
-    [SerializeField] private float laserDamage = 1f;
-    [SerializeField] private float laserTurnSpeedDegPerSec = 180f;
-    [SerializeField] private LayerMask laserHitMask = ~0;
 
     [Header("Teleport Movement")]
     [SerializeField] private GridGenerator gridGenerator;
     [SerializeField] private float teleportInterval = 2.5f;
     [SerializeField] private float minDistanceFromPlayer = 3f;
-    [SerializeField] private GameObject teleportVfxPrefab;
+    [Tooltip("Animator trigger fired on the boss when a teleport is queued. The animation must call OnTeleportAnimationEnd() at its last frame to actually move the boss.")]
+    [SerializeField] private string teleportTriggerName = "Teleport";
 
     private Transform player;
     private Rigidbody2D playerRb;
     private Transform bossTransform;
     private Rigidbody2D bossRb;
+    private Animator bossAnimator;
 
     private GameObject activeLaser;
     private List<Node> cachedValidNodes;
+
+    private Vector3 pendingTeleportPosition;
+    private bool teleportPending;
 
     private void OnEnable()
     {
@@ -81,7 +80,9 @@ public class CreatorPhase3Attack : MonoBehaviour
 
         bossTransform = transform.parent != null ? transform.parent : transform;
         bossRb = bossTransform.GetComponent<Rigidbody2D>();
+        bossAnimator = bossTransform.GetComponentInChildren<Animator>();
         cachedValidNodes = null;
+        teleportPending = false;
 
         // Phase 3: boss can no longer move, only teleport.
         AgentMover mover = GetComponentInParent<AgentMover>();
@@ -113,11 +114,16 @@ public class CreatorPhase3Attack : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(teleportInterval);
-            TeleportToRandomGridPosition();
+            // If a previous teleport is still mid-animation, skip this tick.
+            if (teleportPending) continue;
+            BeginTeleport();
         }
     }
 
-    private void TeleportToRandomGridPosition()
+    // Picks a destination, caches it, and triggers the boss's teleport animation.
+    // The actual position change happens in OnTeleportAnimationEnd, fired by an
+    // animation event on the last frame of the teleport clip.
+    private void BeginTeleport()
     {
         if (gridGenerator == null || bossTransform == null) return;
 
@@ -149,17 +155,32 @@ public class CreatorPhase3Attack : MonoBehaviour
 
         if (pick == null) return;
 
-        if (teleportVfxPrefab != null)
-            Instantiate(teleportVfxPrefab, bossTransform.position, Quaternion.identity);
+        pendingTeleportPosition = pick.transform.position;
+        teleportPending = true;
+
+        if (bossAnimator != null && !string.IsNullOrEmpty(teleportTriggerName))
+        {
+            bossAnimator.SetTrigger(teleportTriggerName);
+        }
+        else
+        {
+            // No animator wired — fall back to immediate teleport so the boss isn't stuck.
+            Debug.LogWarning($"[{name}] No animator/trigger configured; teleporting immediately.");
+            OnTeleportAnimationEnd();
+        }
+    }
+
+    // Animation event hook — call on the final frame of the teleport animation.
+    public void OnTeleportAnimationEnd()
+    {
+        if (!teleportPending) return;
+        teleportPending = false;
 
         // Set via Rigidbody2D so physics doesn't fight the position change.
         if (bossRb != null)
-            bossRb.position = pick.transform.position;
-        else
-            bossTransform.position = pick.transform.position;
-
-        if (teleportVfxPrefab != null)
-            Instantiate(teleportVfxPrefab, bossTransform.position, Quaternion.identity);
+            bossRb.position = pendingTeleportPosition;
+        else if (bossTransform != null)
+            bossTransform.position = pendingTeleportPosition;
     }
 
     private void CacheValidNodes()
@@ -262,93 +283,28 @@ public class CreatorPhase3Attack : MonoBehaviour
         }
     }
 
-    // ── Laser Attack (charge + tracking beam) ────────────────────────────
+    // ── Laser Attack (animation-event driven) ────────────────────────────
+    // The laser prefab owns its own animator + LaserBeam component. Its
+    // animation events call EnableHitbox / DisableHitbox / Despawn on itself,
+    // so this coroutine just spawns the beam and waits for it to clean up.
 
     private IEnumerator LaserAttack()
     {
         if (laserPrefab == null || player == null) yield break;
 
-        GameObject laser = Instantiate(laserPrefab, bossTransform.position, Quaternion.identity);
+        Vector2 dir = ((Vector2)(player.position - bossTransform.position)).normalized;
+        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg - 90f;
+
+        GameObject laser = Instantiate(laserPrefab, bossTransform.position,
+            Quaternion.Euler(0f, 0f, angle), bossTransform);
         activeLaser = laser;
 
-        try
-        {
-            Vector2 dir = ((Vector2)(player.position - bossTransform.position)).normalized;
-            float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-            laser.transform.rotation = Quaternion.Euler(0f, 0f, angle);
+        LaserBeam beam = laser.GetComponent<LaserBeam>();
+        if (beam != null) beam.SetTarget(player);
 
-            // ── Charge phase: thin telegraph while locking on.
-            Vector3 baseScale = laser.transform.localScale;
-            laser.transform.localScale = new Vector3(baseScale.x, baseScale.y * 0.25f, baseScale.z);
-
-            float chargeElapsed = 0f;
-            while (chargeElapsed < laserChargeTime)
-            {
-                if (laser == null || bossTransform == null) yield break;
-                laser.transform.position = bossTransform.position;
-                if (player != null)
-                {
-                    Vector2 desired = ((Vector2)(player.position - bossTransform.position)).normalized;
-                    float desiredAngle = Mathf.Atan2(desired.y, desired.x) * Mathf.Rad2Deg;
-                    angle = Mathf.MoveTowardsAngle(angle, desiredAngle, laserTurnSpeedDegPerSec * Time.deltaTime);
-                    laser.transform.rotation = Quaternion.Euler(0f, 0f, angle);
-                }
-                chargeElapsed += Time.deltaTime;
-                yield return null;
-            }
-
-            if (laser != null) laser.transform.localScale = baseScale;
-
-            // ── Fire phase: beam tracks player, raycast damage.
-            float fireElapsed = 0f;
-            float damageTimer = 0f;
-            while (fireElapsed < laserDuration)
-            {
-                if (laser == null || bossTransform == null) yield break;
-                laser.transform.position = bossTransform.position;
-                if (player != null)
-                {
-                    Vector2 desired = ((Vector2)(player.position - bossTransform.position)).normalized;
-                    float desiredAngle = Mathf.Atan2(desired.y, desired.x) * Mathf.Rad2Deg;
-                    angle = Mathf.MoveTowardsAngle(angle, desiredAngle, laserTurnSpeedDegPerSec * Time.deltaTime);
-                    laser.transform.rotation = Quaternion.Euler(0f, 0f, angle);
-                }
-
-                Vector2 fireDir = new Vector2(Mathf.Cos(angle * Mathf.Deg2Rad), Mathf.Sin(angle * Mathf.Deg2Rad));
-
-                damageTimer += Time.deltaTime;
-                if (damageTimer >= laserDamageInterval)
-                {
-                    damageTimer = 0f;
-                    ApplyLaserDamage(fireDir);
-                }
-
-                fireElapsed += Time.deltaTime;
-                yield return null;
-            }
-        }
-        finally
-        {
-            if (laser != null) Destroy(laser);
-            activeLaser = null;
-        }
-    }
-
-    private void ApplyLaserDamage(Vector2 direction)
-    {
-        if (bossTransform == null) return;
-
-        RaycastHit2D[] hits = Physics2D.RaycastAll(bossTransform.position, direction, laserRange, laserHitMask);
-        for (int i = 0; i < hits.Length; i++)
-        {
-            Collider2D col = hits[i].collider;
-            if (col == null) continue;
-            if (!col.CompareTag("Player")) continue;
-
-            PlayerHealth ph = col.GetComponent<PlayerHealth>();
-            if (ph != null) ph.TakeDamage(laserDamage);
-            return;
-        }
+        // Wait for the laser to despawn itself via its end-of-clip animation event.
+        while (laser != null) yield return null;
+        activeLaser = null;
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────

@@ -18,7 +18,11 @@ public class GameManager : MonoBehaviour
     private GameState currentState = GameState.MainMenu;
     private int currentLevel = 1;
     private bool isLoadingScene = false;
-    
+
+    [Header("Music")]
+    [Tooltip("Played when the player clicks the Start button.")]
+    [SerializeField] private AudioClip gameplayMusic;
+
     // UI elements we'll find dynamically
     private GameObject mainMenuUI;
     private GameObject pauseMenuUI;
@@ -180,6 +184,10 @@ public class GameManager : MonoBehaviour
     {
         if (isLoadingScene) return;
         isLoadingScene = true;
+
+        if (gameplayMusic != null && SoundManager.Instance != null)
+            SoundManager.Instance.PlayMusic(gameplayMusic);
+
         SceneManager.LoadScene(currentLevel);
     }
 

@@ -137,26 +137,44 @@ public class Projectile : MonoBehaviour
     
     private Transform FindNearestEnemy()
     {
-        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
         Transform closest = null;
         float closestDist = float.MaxValue;
-        
+
+        // Standard tagged enemies.
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
         foreach (GameObject enemyObj in enemies)
         {
             if (!enemyObj.activeInHierarchy) continue;
             Enemy enemy = enemyObj.GetComponent<Enemy>();
             if (enemy == null || enemy.CurrentHealth <= 0) continue;
-            
+
             float dist = Vector2.Distance(transform.position, enemyObj.transform.position);
-            if (dist > homingRange) continue; // Outside homing range
-            
+            if (dist > homingRange) continue;
+
             if (dist < closestDist)
             {
                 closestDist = dist;
                 closest = enemyObj.transform;
-                Debug.Log($"Homing projectile found new target: {closest.name} at distance {closestDist}");
             }
         }
+
+        // Bosses (BossBase) — not tagged "Enemy", but are valid homing targets.
+        BossBase[] bosses = Object.FindObjectsByType<BossBase>(FindObjectsSortMode.None);
+        foreach (BossBase boss in bosses)
+        {
+            if (boss == null || !boss.gameObject.activeInHierarchy) continue;
+            if (boss.CurrentHealth <= 0) continue;
+
+            float dist = Vector2.Distance(transform.position, boss.transform.position);
+            if (dist > homingRange) continue;
+
+            if (dist < closestDist)
+            {
+                closestDist = dist;
+                closest = boss.transform;
+            }
+        }
+
         return closest;
     }
 

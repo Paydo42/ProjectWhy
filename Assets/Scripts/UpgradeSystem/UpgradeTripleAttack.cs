@@ -4,7 +4,8 @@ using UnityEngine;
 public class UpgradeTripleAttack : UpgradeSOBase
 {
     [SerializeField] private int additionalProjectiles = 2;
-    
+            public override int AnimatorTypeId => 5;
+
     [Tooltip("Spread angle between projectiles in degrees")]
     [SerializeField] private float spreadAngle = 15f;
     public override void ApplyUpgrade(GameObject player)

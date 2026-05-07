@@ -60,11 +60,12 @@ public class PillarController : MonoBehaviour
                 upgradeAnimator.SetBool("PlayerInRange", true);
             }
             
-            // Optional: pillar highlight animation
+            /*Optional: pillar highlight animation
             if (_animator != null)
             {
                 _animator.SetBool("PlayerInRange", true);
             }
+            */
         }
     }
     
@@ -81,16 +82,18 @@ public class PillarController : MonoBehaviour
             
             // Trigger animation on the upgrade if it has animator
             Animator upgradeAnimator = _spawnedUpgrade.GetComponent<Animator>();
+          /*
             if (upgradeAnimator != null)
             {
                 upgradeAnimator.SetBool("PlayerInRange", false);
             }
             
-            // Optional: pillar highlight animation
+             Optional: pillar highlight animation
             if (_animator != null)
             {
                 _animator.SetBool("PlayerInRange", false);
             }
+            */
         }
     }
     

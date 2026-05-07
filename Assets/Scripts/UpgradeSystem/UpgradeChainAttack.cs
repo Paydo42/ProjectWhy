@@ -5,7 +5,8 @@ public class UpgradeChainAttack : UpgradeSOBase
 {
     [Tooltip("How many enemies the projectile chains to")]
     [SerializeField] private int chainCount = 2;
-    
+        public override int AnimatorTypeId => 6;
+
     [Tooltip("Range to search for next enemy to chain to")]
     [SerializeField] private float chainRange = 5f;
     

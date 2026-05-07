@@ -5,6 +5,8 @@ public class UpgradeBouncingProjectile : UpgradeSOBase
 {
     [Tooltip("Number of bounces for the projectile")]
     [SerializeField] private int bounceCount = 3; // Number of bounces for the projectile
+            public override int AnimatorTypeId => 9;
+
     public override void ApplyUpgrade(GameObject player)
     {
         PlayerShooting playerShooting = player.GetComponent<PlayerShooting>();

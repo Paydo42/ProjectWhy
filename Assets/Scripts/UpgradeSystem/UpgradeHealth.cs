@@ -2,6 +2,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "UpgradeHealth", menuName = "Upgrades/Health Upgrade")]
 public class UpgradeHealth : UpgradeSOBase
 {
+    public override int AnimatorTypeId => 1;
 
     [SerializeField] private int healthIncrease;
     public override void ApplyUpgrade(GameObject player)

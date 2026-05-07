@@ -41,16 +41,9 @@ public class EnemyAttackTrinity : EnemyAttackSOBase
     [Range(0f, 45f)]
     public float regularSpreadAngle = 10f;
 
-    [Header("=== LASER PROJECTILE (Third Eye) ===")]
-    [Tooltip("Laser projectile prefab for third eye attacks")]
-    public GameObject laserProjectilePrefab;
-    
-    [Tooltip("Speed of the laser projectile")]
-    public float laserProjectileSpeed = 15f;
-    
-    [Tooltip("Spread angle for laser (usually 0 for precision)")]
-    [Range(0f, 15f)]
-    public float laserSpreadAngle = 0f;
+    [Header("=== LASER BEAM (Third Eye) ===")]
+    [Tooltip("Laser beam prefab for third eye attacks. Must have a LaserBeam component + animator with EnableHitbox/DisableHitbox/Despawn animation events.")]
+    public GameObject laserBeamPrefab;
 
     [Header("=== SPAWN SETTINGS ===")]
     [Tooltip("Offset from eye position to spawn projectile")]
@@ -302,58 +295,28 @@ public class EnemyAttackTrinity : EnemyAttackSOBase
     }
 
     /// <summary>
-    /// Shoots a laser projectile from the third eye
+    /// Spawns a LaserBeam from the third eye. The beam tracks the player and
+    /// drives its own damage window via animation events.
     /// </summary>
     private void ShootLaser(Vector2 direction)
     {
         Debug.Log($"[{enemy.name}] Shooting LASER from THIRD EYE!");
-        
-        if (laserProjectilePrefab == null)
+
+        if (laserBeamPrefab == null)
         {
-            Debug.LogWarning($"[{enemy.name}] No laser projectile prefab assigned!");
+            Debug.LogWarning($"[{enemy.name}] No laser beam prefab assigned!");
             return;
         }
-        
-        if (PoolManager.Instance == null)
-        {
-            Debug.LogError($"[{enemy.name}] PoolManager.Instance is null!");
-            return;
-        }
-        
-        Vector3 spawnPos;
-        if (thirdEye != null)
-        {
-            spawnPos = thirdEye.position + (Vector3)(direction * projectileSpawnOffset);
-        }
-        else
-        {
-            spawnPos = transform.position + (Vector3)(direction * projectileSpawnOffset);
-        }
-        
-        // Apply spread (usually 0 for laser)
-        Vector2 spreadDirection = ApplySpread(direction, laserSpreadAngle);
-        
-        // Calculate rotation
-        float angle = Mathf.Atan2(spreadDirection.y, spreadDirection.x) * Mathf.Rad2Deg;
-        Quaternion rotation = Quaternion.Euler(0, 0, angle - 90f);
-        
-        // Spawn laser projectile
-        GameObject projectile = PoolManager.Instance.Spawn(laserProjectilePrefab, spawnPos, rotation);
-        
-        EnemyProjectile projectileScript = projectile.GetComponent<EnemyProjectile>();
-        if (projectileScript != null)
-        {
-            projectileScript.Initialize(laserProjectilePrefab);
-            projectileScript.SetDirection(spreadDirection, laserProjectileSpeed);
-        }
-        else
-        {
-            Rigidbody2D rb = projectile.GetComponent<Rigidbody2D>();
-            if (rb != null)
-            {
-                rb.linearVelocity = spreadDirection * laserProjectileSpeed;
-            }
-        }
+
+        Transform spawnAnchor = thirdEye != null ? thirdEye : transform;
+
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
+        Quaternion rotation = Quaternion.Euler(0f, 0f, angle);
+
+        GameObject beamObj = Instantiate(laserBeamPrefab, spawnAnchor.position, rotation, spawnAnchor);
+
+        LaserBeam beam = beamObj.GetComponent<LaserBeam>();
+        if (beam != null) beam.SetTarget(playerTransform);
     }
 
     /// <summary>

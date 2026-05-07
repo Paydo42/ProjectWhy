@@ -5,6 +5,7 @@ public class UpgradeFireRate : UpgradeSOBase
 {
     [Tooltip("Amount to increase fire rate by (e.g., 0.2 means 20% faster)")]
     [SerializeField] private float fireRateMultiplier = 0.2f;
+        public override int AnimatorTypeId => 10;
 
     public override void ApplyUpgrade(GameObject player)
     {

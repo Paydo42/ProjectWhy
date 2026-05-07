@@ -2,6 +2,8 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "UpgradeSpeed", menuName = "Upgrades/Speed Upgrade")]
 public class UpgradeSpeed : UpgradeSOBase
 {
+    public override int AnimatorTypeId => 2;
+
     [SerializeField] private float speedIncrease;
 
     public override void ApplyUpgrade(GameObject player)

@@ -2,6 +2,8 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "UpgradePiercingProjectiles", menuName = "Upgrades/Piercing Projectiles Upgrade")]
 public class UpgradePiercingProjectiles : UpgradeSOBase
 {
+    public override int AnimatorTypeId => 3;
+
     [Tooltip("Number of additional enemies the projectile can pierce through (1 = hits 2 enemies total)")]
     [SerializeField] private int pierceCount = 1;
     

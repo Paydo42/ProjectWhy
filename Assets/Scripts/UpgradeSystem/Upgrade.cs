@@ -33,15 +33,8 @@ public class Upgrade : MonoBehaviour
 
     private void SetUpgradeTypeForAnimator()
     {
-        if (upgradeSO is UpgradeHealth)
-        {
-            animator.SetFloat("UpgradeType", 1); // Health
-        }
-        else if (upgradeSO is UpgradeSpeed)
-        {
-            animator.SetFloat("UpgradeType", 2); // Speed
-        }
-      
+        if (upgradeSO != null)
+            animator.SetFloat("UpgradeType", upgradeSO.AnimatorTypeId);
     }
     void OnTriggerEnter2D(Collider2D other)
     {

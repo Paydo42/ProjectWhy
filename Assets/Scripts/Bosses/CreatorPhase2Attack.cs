@@ -36,6 +36,8 @@ public class CreatorPhase2Attack : MonoBehaviour
     [SerializeField] private GridGenerator gridGenerator;
     [SerializeField] private float pathUpdateInterval = 2f;
     [SerializeField] private float wanderRadius = 5f;
+    [Tooltip("Wall/obstacle layer used to validate that A* paths don't physically cross walls. Set this to match the chamber's wall layer.")]
+    [SerializeField] private LayerMask wallLayer;
 
     [Header("Pattern Timing")]
     [SerializeField] private float delayBetweenPatterns = 1f;
@@ -48,6 +50,9 @@ public class CreatorPhase2Attack : MonoBehaviour
 
     private Coroutine attackRoutine;
     private Coroutine movementRoutine;
+
+    // Valid (non-obstacle) nodes within wanderRadius of spawn, cached on first use.
+    private List<Node> cachedWanderNodes;
 
     private void OnEnable()
     {
@@ -65,6 +70,7 @@ public class CreatorPhase2Attack : MonoBehaviour
 
         bossTransform = transform.parent != null ? transform.parent : transform;
         spawnPosition = bossTransform.position;
+        cachedWanderNodes = null;
 
         // Movement and attacks run in parallel
         movementRoutine = StartCoroutine(WanderLoop());
@@ -95,20 +101,69 @@ public class CreatorPhase2Attack : MonoBehaviour
     {
         if (agentMover == null || gridGenerator == null || AStarManager.Instance == null) return;
 
-        Vector2 randomOffset = Random.insideUnitCircle * wanderRadius;
-        Vector3 targetWorld  = (Vector3)(spawnPosition + randomOffset);
-
-        Node targetNode = gridGenerator.GetNodeFromWorldPoint(targetWorld);
-        if (targetNode == null || targetNode.isObstacle) return;
+        if (cachedWanderNodes == null) CacheWanderNodes();
+        if (cachedWanderNodes.Count == 0)
+        {
+            Debug.LogWarning($"[{name}] Phase2 wander: no valid grid nodes found within {wanderRadius} units of spawn.");
+            return;
+        }
 
         Transform bossTf = transform.parent != null ? transform.parent : transform;
-        List<Node> path = AStarManager.Instance.FindPath(gridGenerator, bossTf.position, targetNode.transform.position);
 
-        if (path != null && path.Count > 0)
+        // Pick a node, retry if FindPath happens to fail or the node coincides with current pos.
+        for (int attempt = 0; attempt < 5; attempt++)
         {
-            agentMover.canMove = true;
-            agentMover.SetPath(path);
+            Node targetNode = cachedWanderNodes[Random.Range(0, cachedWanderNodes.Count)];
+            if (targetNode == null) continue;
+            if (Vector2.Distance(bossTf.position, targetNode.transform.position) < 0.05f) continue;
+
+            List<Node> path = AStarManager.Instance.FindPath(gridGenerator, bossTf.position, targetNode.transform.position);
+            if (path != null && path.Count > 0)
+            {
+                agentMover.canMove = true;
+                agentMover.SetPath(path);
+                return;
+            }
         }
+
+        Debug.LogWarning($"[{name}] Phase2 wander: FindPath failed for 5 candidate nodes; check the grid/agent area.");
+    }
+
+    private void CacheWanderNodes()
+    {
+        cachedWanderNodes = new List<Node>();
+        Node[] all = gridGenerator.GetComponentsInChildren<Node>();
+        float radiusSqr = wanderRadius * wanderRadius;
+
+        for (int i = 0; i < all.Length; i++)
+        {
+            Node n = all[i];
+            if (n == null || n.isObstacle) continue;
+            if (((Vector2)n.transform.position - spawnPosition).sqrMagnitude > radiusSqr) continue;
+            if (!IsNodePhysicallyReachable(n)) continue;
+            cachedWanderNodes.Add(n);
+        }
+    }
+
+    // True if A* finds a path AND every segment of that path is clear of walls.
+    // This rejects nodes that A* can technically reach but only via a route the
+    // boss can't physically traverse (e.g. corner-cutting through a wall).
+    private bool IsNodePhysicallyReachable(Node target)
+    {
+        if (AStarManager.Instance == null) return false;
+
+        List<Node> path = AStarManager.Instance.FindPath(gridGenerator, spawnPosition, target.transform.position);
+        if (path == null || path.Count == 0) return false;
+
+        Vector3 prev = spawnPosition;
+        for (int j = 0; j < path.Count; j++)
+        {
+            Vector3 next = path[j].transform.position;
+            if (Physics2D.Linecast(prev, next, wallLayer).collider != null)
+                return false;
+            prev = next;
+        }
+        return true;
     }
 
     // ── Random attack loop (independent of movement) ─────────────────────

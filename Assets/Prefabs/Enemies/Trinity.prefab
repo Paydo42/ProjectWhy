@@ -218,8 +218,8 @@ Transform:
   m_GameObject: {fileID: 5462711522612351569}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.09, y: -0.666, z: 0}
-  m_LocalScale: {x: 1.98, y: 1, z: 1}
+  m_LocalPosition: {x: -0.164, y: -1.089, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6146581495767304982}
@@ -311,7 +311,7 @@ Transform:
   m_GameObject: {fileID: 6750361400534454914}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 12.58, y: 2.78, z: 0}
+  m_LocalPosition: {x: 12.49, y: 2.78, z: 0}
   m_LocalScale: {x: 1.05, y: 1.05, z: 1.05}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -357,17 +357,17 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -0.14, y: 0.36}
+  m_Offset: {x: 0.05518222, y: -0.10657926}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.6125398, y: 0.15472208}
-    oldSize: {x: 2.2083333, y: 1.1666666}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 1.625, y: 1.5833334}
     newSize: {x: 0.875, y: 1.3125}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 0.8421807, y: 0.96}
+  m_Size: {x: 1.2325451, y: 0.9468416}
   m_EdgeRadius: 0
 --- !u!50 &6647029372410865365
 Rigidbody2D:
@@ -406,7 +406,7 @@ Animator:
   m_GameObject: {fileID: 6750361400534454914}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: d76a7dc5d87f5ec4b8510390e176dbd0, type: 2}
+  m_Controller: {fileID: 9100000, guid: 72ae0f26ebece5a4bbbcf2e10e3bec1f, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -462,7 +462,7 @@ SpriteRenderer:
   m_SortingLayerID: 1058008283
   m_SortingLayer: 5
   m_SortingOrder: 0
-  m_Sprite: {fileID: -7999941445972809183, guid: 028b13e656b9e4745a3845014705f162, type: 3}
+  m_Sprite: {fileID: 3058828892170542191, guid: a24f8b477dfc06240a2e697df16ee84d, type: 3}
   m_Color: {r: 0.9547169, g: 0.9547169, b: 0.9547169, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -486,7 +486,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   idleAnimationStateName: EnemyIdleBlendTree
-  deathTriggerName: IsDeathAngel
+  deathTriggerName: IsDeathTrinity
   takeDamageTriggerName: IsTakingDamage
   attackBoolName: IsAttacking
   useAnimationDrivenAttack: 0
@@ -576,7 +576,7 @@ Transform:
   m_GameObject: {fileID: 7797547968234161361}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.074, y: 0.703, z: 0}
+  m_LocalPosition: {x: -0.273, y: 0.3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -688,7 +688,7 @@ Transform:
   m_GameObject: {fileID: 9016210561326982099}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.195, y: 0.978, z: 0}
+  m_LocalPosition: {x: 0.166, y: 0.612, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -719,7 +719,7 @@ Transform:
   m_GameObject: {fileID: 9148039053161685050}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.449, y: 0.711, z: 0}
+  m_LocalPosition: {x: 0.574, y: 0.3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

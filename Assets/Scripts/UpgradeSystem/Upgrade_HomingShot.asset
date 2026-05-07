@@ -14,3 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   homingStrength: 5
   homingRange: 8
+  followerPrefab: {fileID: 6323001366521327032, guid: c8ffb38e490618f459360ce75f3145e6, type: 3}
+  followerLocalOffset: {x: 0.5, y: 1, z: 0}

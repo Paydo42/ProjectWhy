@@ -1,0 +1,299 @@
+fileFormatVersion: 2
+guid: f1fea0556a3e77a4789fd3455fa57229
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -4007090216154520887
+    second: TrinityLeftWalk_0
+  - first:
+      213: 6844289229716236252
+    second: TrinityLeftWalk_1
+  - first:
+      213: -4882358266996570315
+    second: TrinityLeftWalk_2
+  - first:
+      213: 3873885009969478477
+    second: TrinityLeftWalk_3
+  - first:
+      213: 1685876157088865837
+    second: TrinityLeftWalk_4
+  - first:
+      213: -3969179670196434926
+    second: TrinityLeftWalk_5
+  - first:
+      213: -3629272895950597430
+    second: TrinityLeftWalk_6
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 24
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: TrinityLeftWalk_0
+      rect:
+        serializedVersion: 2
+        x: 9
+        y: 2
+        width: 39
+        height: 38
+      alignment: 9
+      pivot: {x: 0.41881296, y: 0.4807715}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9c2aa2bcda4f368c0800000000000000
+      internalID: -4007090216154520887
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TrinityLeftWalk_1
+      rect:
+        serializedVersion: 2
+        x: 73
+        y: 2
+        width: 38
+        height: 37
+      alignment: 9
+      pivot: {x: 0.41347203, y: 0.49999994}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cd7a445bacccbfe50800000000000000
+      internalID: 6844289229716236252
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TrinityLeftWalk_2
+      rect:
+        serializedVersion: 2
+        x: 137
+        y: 1
+        width: 38
+        height: 36
+      alignment: 9
+      pivot: {x: 0.3846295, y: 0.50676537}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5374a7526016e3cb0800000000000000
+      internalID: -4882358266996570315
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TrinityLeftWalk_3
+      rect:
+        serializedVersion: 2
+        x: 201
+        y: 0
+        width: 38
+        height: 35
+      alignment: 9
+      pivot: {x: 0.39744848, y: 0.5069587}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d4bf0ff44edc2c530800000000000000
+      internalID: 3873885009969478477
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TrinityLeftWalk_4
+      rect:
+        serializedVersion: 2
+        x: 264
+        y: 0
+        width: 40
+        height: 33
+      alignment: 9
+      pivot: {x: 0.3690857, y: 0.49630964}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d2e1596ce6f656710800000000000000
+      internalID: 1685876157088865837
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TrinityLeftWalk_5
+      rect:
+        serializedVersion: 2
+        x: 328
+        y: 0
+        width: 39
+        height: 35
+      alignment: 9
+      pivot: {x: 0.41256872, y: 0.49652028}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2184d3c9e14aae8c0800000000000000
+      internalID: -3969179670196434926
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TrinityLeftWalk_6
+      rect:
+        serializedVersion: 2
+        x: 392
+        y: 1
+        width: 39
+        height: 37
+      alignment: 9
+      pivot: {x: 0.41881385, y: 0.5131654}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ac259e3a78b32adc0800000000000000
+      internalID: -3629272895950597430
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: e0bfb4b1d2494c54dbd260eba9dfd98d
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      TrinityLeftWalk_0: -4007090216154520887
+      TrinityLeftWalk_1: 6844289229716236252
+      TrinityLeftWalk_2: -4882358266996570315
+      TrinityLeftWalk_3: 3873885009969478477
+      TrinityLeftWalk_4: 1685876157088865837
+      TrinityLeftWalk_5: -3969179670196434926
+      TrinityLeftWalk_6: -3629272895950597430
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

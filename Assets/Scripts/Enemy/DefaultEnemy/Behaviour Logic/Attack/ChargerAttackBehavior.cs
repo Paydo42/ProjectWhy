@@ -11,6 +11,19 @@ public class ChargerAttackBehavior : EnemyAttackSOBase
     [SerializeField] private float wallCheckDistance = 0.7f;
     [SerializeField] private float arrivalDistance = 0.75f;
 
+    [Header("Animator Bool Names (leave blank to skip)")]
+    [Tooltip("Driven true while telegraphing. The clip's animation event must call OnWindupAnimationEnd() to start the dash.")]
+    [SerializeField] private string windupBoolName  = "IsWindup";
+    [SerializeField] private string chargeBoolName  = "IsCharging";
+    [Tooltip("Driven true while stuck on the wall. The clip's animation event must call OnWallStunAnimationEnd() to recover.")]
+    [SerializeField] private string stunBoolName    = "IsWallStunned";
+
+    [Header("Animation Event Fallback Timeouts")]
+    [Tooltip("Safety net: if the windup animation event never fires within this many seconds, force-recover. Set to 0 to disable.")]
+    [SerializeField] private float windupFallbackTimeout = 2f;
+    [Tooltip("Safety net: if the wall-stun animation event never fires within this many seconds, force-recover. Set to 0 to disable.")]
+    [SerializeField] private float wallStunFallbackTimeout = 2f;
+
     [Header("Approach Redirect (unpredictability)")]
     [SerializeField] private float minRedirectInterval = 0.4f;
     [SerializeField] private float maxRedirectInterval = 1.2f;
@@ -21,16 +34,19 @@ public class ChargerAttackBehavior : EnemyAttackSOBase
     [SerializeField] private LayerMask obstacleLayer;
     [SerializeField] private LayerMask playerLayer;
 
+    // Windup     = telegraph pause before a dash
     // Charging   = fast cardinal dash until wall
+    // WallStun   = stuck-on-wall recovery pause after a dash
     // Scanning   = brief pause + 3 rays (forward, left, right — not behind)
     // Approaching = normal speed cardinal walk toward player
-    private enum ChargerState { Charging, Scanning, Approaching }
+    private enum ChargerState { Windup, Charging, WallStun, Scanning, Approaching }
 
     private ChargerState currentState;
     private Vector2 chargeDirection;
     private float scanTimer;
     private float redirectTimer;
     private float nextRedirectTime;
+    private float phaseTimer; // Drives the windup/wall-stun animation-event fallbacks.
 
     public override void DoEnterLogic()
     {
@@ -40,7 +56,7 @@ public class ChargerAttackBehavior : EnemyAttackSOBase
             enemy.cardinalMover.canMove = true;
 
         chargeDirection = CardinalToward(playerTransform.position);
-        BeginCharge(chargeDirection);
+        BeginWindup(chargeDirection);
     }
 
     public override void DoExitLogic()
@@ -48,6 +64,8 @@ public class ChargerAttackBehavior : EnemyAttackSOBase
         base.DoExitLogic();
         if (enemy.cardinalMover != null)
             enemy.cardinalMover.StopMovement();
+        SetAnimBools(false, false, false);
+        enemy.SuppressIsWalkingAnim = false;
     }
 
     public override void DoFrameUpdateLogic()
@@ -56,6 +74,12 @@ public class ChargerAttackBehavior : EnemyAttackSOBase
 
         switch (currentState)
         {
+            case ChargerState.Windup:
+                UpdateWindupFallback();
+                break;
+            case ChargerState.WallStun:
+                UpdateWallStunFallback();
+                break;
             case ChargerState.Charging:
                 UpdateCharging();
                 break;
@@ -68,12 +92,66 @@ public class ChargerAttackBehavior : EnemyAttackSOBase
         }
     }
 
+    // Fires OnWindupAnimationEnd manually if the animation event doesn't arrive in time.
+    private void UpdateWindupFallback()
+    {
+        if (windupFallbackTimeout <= 0f) return;
+        phaseTimer += Time.deltaTime;
+        if (phaseTimer >= windupFallbackTimeout)
+        {
+            Debug.LogWarning($"[Charger] Windup animation event timed out after {windupFallbackTimeout}s — recovering. " +
+                             "Check that OnWindupAnimationEnd is wired on the windup clip's last frame.", enemy);
+            OnWindupAnimationEnd();
+        }
+    }
+
+    // Fires OnWallStunAnimationEnd manually if the animation event doesn't arrive in time.
+    private void UpdateWallStunFallback()
+    {
+        if (wallStunFallbackTimeout <= 0f) return;
+        phaseTimer += Time.deltaTime;
+        if (phaseTimer >= wallStunFallbackTimeout)
+        {
+            Debug.LogWarning($"[Charger] Wall-stun animation event timed out after {wallStunFallbackTimeout}s — recovering. " +
+                             "Check that OnWallStunAnimationEnd is wired on the wall-stun clip's last frame.", enemy);
+            OnWallStunAnimationEnd();
+        }
+    }
+
+    // ── Windup ──────────────────────────────────────────────────────────
+
+    private void BeginWindup(Vector2 cardinalDir)
+    {
+        currentState = ChargerState.Windup;
+        chargeDirection = cardinalDir;
+        phaseTimer = 0f;
+
+        if (enemy.cardinalMover != null)
+            enemy.cardinalMover.StopMovement();
+
+        // Force the blend-tree (LastMoveX/Y) to face the charge direction
+        // so the telegraph animation aims at the player even though we're stationary.
+        enemy.SetLastMoveDirection(cardinalDir);
+
+        SetAnimBools(windup: true, charge: false, stun: false);
+    }
+
+    // Animation event hook — called from the windup clip's last frame.
+    public void OnWindupAnimationEnd()
+    {
+        if (currentState != ChargerState.Windup) return;
+        BeginCharge(chargeDirection);
+    }
+
     // ── Charge ──────────────────────────────────────────────────────────
 
     private void BeginCharge(Vector2 cardinalDir)
     {
         currentState = ChargerState.Charging;
         chargeDirection = cardinalDir;
+
+        SetAnimBools(windup: false, charge: true, stun: false);
+        enemy.SuppressIsWalkingAnim = true;
 
         if (enemy.cardinalMover != null)
         {
@@ -85,13 +163,33 @@ public class ChargerAttackBehavior : EnemyAttackSOBase
 
     private void UpdateCharging()
     {
-        // Stop when the charge direction hits a wall
+        // Slammed into a wall — stop, play stun anim, then resume normal logic
         if (IsWallInDirection(chargeDirection))
         {
             if (enemy.cardinalMover != null) enemy.cardinalMover.StopMovement();
-            currentState = ChargerState.Scanning;
-            scanTimer = 0f;
+            BeginWallStun();
         }
+    }
+
+    // ── Wall Stun ───────────────────────────────────────────────────────
+
+    private void BeginWallStun()
+    {
+        currentState = ChargerState.WallStun;
+        phaseTimer = 0f;
+        // Direction stays the same so the stun animation still faces the wall.
+        SetAnimBools(windup: false, charge: false, stun: true);
+        enemy.SuppressIsWalkingAnim = false;
+    }
+
+    // Animation event hook — called from the wall-stun clip's last frame.
+    public void OnWallStunAnimationEnd()
+    {
+        if (currentState != ChargerState.WallStun) return;
+        SetAnimBools(false, false, false);
+        currentState = ChargerState.Scanning;
+        
+        scanTimer = 0f;
     }
 
     // ── Approach ────────────────────────────────────────────────────────
@@ -102,6 +200,8 @@ public class ChargerAttackBehavior : EnemyAttackSOBase
         chargeDirection = cardinalDir;
         redirectTimer = 0f;
         nextRedirectTime = Random.Range(minRedirectInterval, maxRedirectInterval);
+
+        SetAnimBools(false, false, false);
 
         if (enemy.cardinalMover != null)
         {
@@ -116,10 +216,10 @@ public class ChargerAttackBehavior : EnemyAttackSOBase
         Vector2 forward = chargeDirection;
         if (forward.sqrMagnitude < 0.01f) forward = Vector2.right;
 
-        // Player directly ahead — begin new charge immediately
+        // Player directly ahead — windup + charge
         if (CastRayForPlayer(forward))
         {
-            BeginCharge(CardinalToward(playerTransform.position));
+            BeginWindup(CardinalToward(playerTransform.position));
             return;
         }
 
@@ -165,8 +265,8 @@ public class ChargerAttackBehavior : EnemyAttackSOBase
 
         if (CastRayForPlayer(forward) || CastRayForPlayer(left) || CastRayForPlayer(right))
         {
-            // Hit player — charge in cardinal direction toward them
-            BeginCharge(CardinalToward(playerTransform.position));
+            // Hit player — windup, then charge in cardinal direction toward them
+            BeginWindup(CardinalToward(playerTransform.position));
         }
         else
         {
@@ -176,6 +276,14 @@ public class ChargerAttackBehavior : EnemyAttackSOBase
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────
+
+    private void SetAnimBools(bool windup, bool charge, bool stun)
+    {
+        if (enemy.animator == null) return;
+        if (!string.IsNullOrEmpty(windupBoolName)) enemy.animator.SetBool(windupBoolName, windup);
+        if (!string.IsNullOrEmpty(chargeBoolName)) enemy.animator.SetBool(chargeBoolName, charge);
+        if (!string.IsNullOrEmpty(stunBoolName))   enemy.animator.SetBool(stunBoolName,   stun);
+    }
 
     private bool IsWallInDirection(Vector2 dir)
     {
@@ -206,7 +314,7 @@ public class ChargerAttackBehavior : EnemyAttackSOBase
     public override void ResetValues()
     {
         base.ResetValues();
-        currentState = ChargerState.Charging;
+        currentState = ChargerState.Windup;
         scanTimer = 0f;
     }
 }

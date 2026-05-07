@@ -1,24 +1,5 @@
 using UnityEngine;
 
-/// <summary>
-/// Trinity Enemy - A unique enemy with three heads (left, right, and top)
-/// 
-/// BEHAVIOR:
-/// - Can see LEFT, RIGHT, and UP (not down/forward)
-/// - Uses raycasts from three eyes to detect the player
-/// - Has only 2 states: IDLE (Patrol) and ATTACK (no chase state)
-/// - Patrols between 4 corner points (edges of roam area)
-/// - When player detected via raycast → Attack
-/// - LEFT/RIGHT eyes shoot regular projectiles
-/// - TOP eye shoots laser-like projectile
-/// - When player lost → Return to Patrol
-/// 
-/// SETUP IN UNITY:
-/// 1. Assign EnemyIdleTrinityPatrol ScriptableObject to EnemyIdleBaseInstance
-/// 2. Assign EnemyAttackTrinity ScriptableObject to EnemyAttackBaseInstance
-/// 3. Create child GameObjects for LeftEye, RightEye, and ThirdEye transforms
-/// 4. Configure layers in the ScriptableObjects (PlayerLayer and ObstacleLayer)
-/// </summary>
 public class Trinity : Enemy
 {
     [Header("=== TRINITY EYE TRANSFORMS ===")]

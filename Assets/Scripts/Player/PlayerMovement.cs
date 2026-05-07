@@ -9,6 +9,7 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody2D rb;
     private Vector2 movementInput;
     private Animator animator;
+    private PlayerHealth playerHealth;
     public Vector2 lastMoveDir = Vector2.right;
     public Transform firePoint;
 
@@ -16,6 +17,7 @@ public class PlayerMovement : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+        playerHealth = GetComponent<PlayerHealth>();
 
         // Ensure firePoint is set
          firePointBaseLocalPosition = firePoint.localPosition;
@@ -64,6 +66,8 @@ public class PlayerMovement : MonoBehaviour
     }
     void FixedUpdate()
     {
+        // Don't overwrite velocity while knockback is being applied by PlayerHealth.
+        if (playerHealth != null && playerHealth.IsKnockedBack) return;
         rb.linearVelocity = movementInput * moveSpeed;
     }
 

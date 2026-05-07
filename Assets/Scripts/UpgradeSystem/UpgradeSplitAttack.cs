@@ -5,7 +5,8 @@ public class UpgradeSplitAttack : UpgradeSOBase
 {
     [Tooltip("Number of additional projectiles to add (e.g., 1 means player shoots 2 total)")]
     [SerializeField] private int additionalProjectiles = 1;
-    
+        public override int AnimatorTypeId => 4;
+
     [Tooltip("Spread angle between projectiles in degrees")]
     [SerializeField] private float spreadAngle = 30f;
 

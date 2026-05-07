@@ -96,7 +96,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &9203959915843935229
 Transform:
   m_ObjectHideFlags: 0
@@ -218,8 +218,8 @@ Transform:
   m_GameObject: {fileID: 5462711522612351569}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.09, y: -0.666, z: 0}
-  m_LocalScale: {x: 1.98, y: 1, z: 1}
+  m_LocalPosition: {x: 0.09, y: -1.34, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6146581495767304982}
@@ -268,7 +268,7 @@ SpriteRenderer:
   m_SortingLayerID: 1058008283
   m_SortingLayer: 5
   m_SortingOrder: 0
-  m_Sprite: {fileID: 8737464233079380311, guid: 4bea7bbe1e635d94c884ec90af8d9813, type: 3}
+  m_Sprite: {fileID: -7032082532594847741, guid: 7ba8a517b9ead8844a3c544826656f7c, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -356,17 +356,17 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -0.14, y: 0.36}
+  m_Offset: {x: -0.0011199117, y: -0.009023905}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.6125398, y: 0.15472208}
-    oldSize: {x: 2.2083333, y: 1.1666666}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 1.65625, y: 1.9375}
     newSize: {x: 0.875, y: 1.3125}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 0.8421807, y: 0.96}
+  m_Size: {x: 0.5644206, y: 1.6980476}
   m_EdgeRadius: 0
 --- !u!50 &6647029372410865365
 Rigidbody2D:
@@ -380,7 +380,7 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 1
+  m_Mass: 1000
   m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_GravityScale: 0
@@ -405,7 +405,7 @@ Animator:
   m_GameObject: {fileID: 6750361400534454914}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: d76a7dc5d87f5ec4b8510390e176dbd0, type: 2}
+  m_Controller: {fileID: 9100000, guid: acb9385c0eaf3a34d86ff4005d538942, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -461,7 +461,7 @@ SpriteRenderer:
   m_SortingLayerID: 1058008283
   m_SortingLayer: 5
   m_SortingOrder: 0
-  m_Sprite: {fileID: -7999941445972809183, guid: 028b13e656b9e4745a3845014705f162, type: 3}
+  m_Sprite: {fileID: -3918141055772416863, guid: c165d73af0147604babcfb92e2fbd25b, type: 3}
   m_Color: {r: 0.9547169, g: 0.9547169, b: 0.9547169, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -485,7 +485,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   idleAnimationStateName: EnemyIdleBlendTree
-  deathTriggerName: IsDeathAngel
+  deathTriggerName: IsDeathSorcerer
   takeDamageTriggerName: IsTakingDamage
   attackBoolName: IsAttacking
   useAnimationDrivenAttack: 0
@@ -502,7 +502,7 @@ MonoBehaviour:
   EnemyIdleBaseInstance: {fileID: 0}
   EnemyChaseBaseInstance: {fileID: 0}
   EnemyAttackBaseInstance: {fileID: 11400000, guid: bf9597c2c1c98ce41b471262a26bf3b5, type: 2}
-  enemyData: {fileID: 11400000, guid: 3c3428bdfc3d56d4695d8ddf970d6414, type: 2}
+  enemyData: {fileID: 11400000, guid: fb222c6f5e30bd74ba4db75cbf4e8aaf, type: 2}
 --- !u!114 &-8782834178904668632
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -533,7 +533,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &470568721108912471
 Transform:
   m_ObjectHideFlags: 0
@@ -645,7 +645,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1427385485079901007
 Transform:
   m_ObjectHideFlags: 0
@@ -676,7 +676,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &700875864402738425
 Transform:
   m_ObjectHideFlags: 0

@@ -218,8 +218,8 @@ Transform:
   m_GameObject: {fileID: 5462711522612351569}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.19, y: -0.69, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: -0.92, z: 0}
+  m_LocalScale: {x: 3, y: 4, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6146581495767304982}
@@ -265,8 +265,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 1058008283
-  m_SortingLayer: 5
+  m_SortingLayerID: 909827339
+  m_SortingLayer: 4
   m_SortingOrder: 0
   m_Sprite: {fileID: 8737464233079380311, guid: 4bea7bbe1e635d94c884ec90af8d9813, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -355,8 +355,8 @@ BoxCollider2D:
   m_Offset: {x: 0.02363871, y: 0.41999996}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.15}
-    oldSize: {x: 1.5833334, y: 2.0416667}
+    pivot: {x: 0.5073084, y: 0.32213995}
+    oldSize: {x: 2.6388888, y: 3}
     newSize: {x: 0.875, y: 1.3125}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -401,7 +401,7 @@ Animator:
   m_GameObject: {fileID: 6750361400534454914}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 80a9d458948fad54b8d8aa8624f6dded, type: 2}
+  m_Controller: {fileID: 9100000, guid: 9c29e9f1030522a4bba7bbef5739cf9a, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -457,7 +457,7 @@ SpriteRenderer:
   m_SortingLayerID: 1058008283
   m_SortingLayer: 5
   m_SortingOrder: 0
-  m_Sprite: {fileID: -1202309240467086668, guid: c13673f967cd0ad40b8fd9b5dc581ef4, type: 3}
+  m_Sprite: {fileID: -6268301485490471908, guid: 40768d695019c334eb5a9be284483638, type: 3}
   m_Color: {r: 0.9547169, g: 0.9547169, b: 0.9547169, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -485,10 +485,12 @@ MonoBehaviour:
   projectileDamage: 1
   spiralFireRate: 0.06
   spiralBulletsPerRotation: 36
-  spiralArms: 4
+  minSprialArms: 2
+  maxSpiralArms: 5
   spiralDuration: 4
   burstBulletCount: 20
-  burstWaves: 4
+  minBurstWaves: 3
+  maxBurstWaves: 5
   burstWaveDelay: 0.5
   aimedShotCount: 7
   aimedShotDelay: 0.2
@@ -496,9 +498,9 @@ MonoBehaviour:
   oracleShotCount: 5
   oracleShotDelay: 0.4
   oracleProjectileSpeed: 10
-  moveSpeed: 3
-  moveRadius: 4
-  moveDuration: 1.5
+  gridGenerator: {fileID: 0}
+  pathUpdateInterval: 2
+  wanderRadius: 5
   delayBetweenPatterns: 1
 --- !u!1 &8652582045148003831
 GameObject:

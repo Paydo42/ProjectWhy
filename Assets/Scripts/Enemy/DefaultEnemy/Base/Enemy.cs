@@ -62,6 +62,10 @@ public class Enemy : MonoBehaviour, IDamageable, IEnemyMoveable, ITriggerCheckAb
     // Public property to allow states to read the mask
     public LayerMask LineOfSightMask => lineOfSightMask;
 
+    // Lets behavior SOs disable the auto-driven IsWalking animator bool
+    // (e.g. while playing a dedicated dash/charge animation that already handles motion).
+    public bool SuppressIsWalkingAnim { get; set; }
+
     [Header("Colliders")]
     [Tooltip("Assign a child collider here used for specific checks if needed. If null, the main collider might be used as fallback elsewhere.")]
     public BoxCollider2D avoidanceCollider;
@@ -584,7 +588,7 @@ public class Enemy : MonoBehaviour, IDamageable, IEnemyMoveable, ITriggerCheckAb
 
          // Determine if moving — works for both AgentMover and CardinalAgentMover
          bool isMoving = RB.linearVelocity.sqrMagnitude > 0.1f;
-         animator.SetBool("IsWalking", isMoving);
+         animator.SetBool("IsWalking", isMoving && !SuppressIsWalkingAnim);
 
          // Update last move direction when moving
          if (isMoving)
@@ -600,4 +604,11 @@ public class Enemy : MonoBehaviour, IDamageable, IEnemyMoveable, ITriggerCheckAb
 
     // Public getter if other scripts need access to last move direction
     public Vector2 LastMoveDirection => lastMoveDirection;
+
+    // Lets behavior SOs face directional blend-tree animations (windup, stun, etc.)
+    // toward a chosen direction while the enemy is stationary.
+    public void SetLastMoveDirection(Vector2 dir)
+    {
+        if (dir.sqrMagnitude > 0.0001f) lastMoveDirection = dir.normalized;
+    }
 }

@@ -4,7 +4,8 @@ public class UpgradeDamageBuff : UpgradeSOBase
 {
     [Tooltip("Amount of bonus damage to add to projectiles")]
     [SerializeField] private float damageIncrease = 1f;
-    
+    public override int AnimatorTypeId => 7;
+
     public override void ApplyUpgrade(GameObject player)
     {
         PlayerShooting playerShooting = player.GetComponent<PlayerShooting>();

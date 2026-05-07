@@ -47,7 +47,7 @@ public class EnemyProjectile : MonoBehaviour
             PlayerHealth playerHealth = other.GetComponent<PlayerHealth>();
             if (playerHealth != null)
             {
-                playerHealth.TakeDamage(damage);
+                playerHealth.TakeDamage(damage, transform.position);
             }
             
             // Instead of Destroy(gameObject), we return it to the pool

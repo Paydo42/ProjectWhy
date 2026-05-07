@@ -11,6 +11,18 @@ public class EnemyAttackTp : EnemyAttackSOBase
     [SerializeField] private float minDistanceFromPlayer = 3f;
     [SerializeField] private GameObject teleportVfxPrefab;
 
+    [Header("Animator Bool Names (leave blank to skip)")]
+    [Tooltip("True while the begin-teleport animation plays at the old position. Last frame must call OnTpBeginAnimationEnd.")]
+    [SerializeField] private string tpBeginBoolName  = "IsTpBegin";
+    [Tooltip("True while the appear animation plays at the new position. Last frame must call OnTpAppearAnimationEnd.")]
+    [SerializeField] private string tpAppearBoolName = "IsTpAppear";
+
+    [Header("Animation Event Fallback Timeouts")]
+    [Tooltip("Force-recover if the begin animation event never fires within this time. 0 disables.")]
+    [SerializeField] private float tpBeginFallbackTimeout = 2f;
+    [Tooltip("Force-recover if the appear animation event never fires within this time. 0 disables.")]
+    [SerializeField] private float tpAppearFallbackTimeout = 2f;
+
     [Header("Attack Settings")]
     [SerializeField] private GameObject projectilePrefab;
     [SerializeField] private float projectileSpeed = 5f;
@@ -18,9 +30,16 @@ public class EnemyAttackTp : EnemyAttackSOBase
     [SerializeField] private float chargeTime = 1f;
     [SerializeField] private float spreadAngle = 4f;
 
-    private enum TpState { Teleporting, Charging, Shooting, Cooldown }
+    // TpBegin   = telegraph anim at old position; ends with OnTpBeginAnimationEnd → snap + TpAppear
+    // TpAppear  = arrival anim at new position; ends with OnTpAppearAnimationEnd → Charging
+    // Charging  = timer-based aim/charge
+    // Shooting  = fire one volley
+    // Cooldown  = wait, then loop back to TpBegin
+    private enum TpState { TpBegin, TpAppear, Charging, Shooting, Cooldown }
     private TpState currentState;
     private float stateTimer;
+    private float phaseTimer;
+    private Vector3 pendingDestination;
 
     private List<Node> cachedValidNodes;
     private GridGenerator gridGenerator;
@@ -46,8 +65,13 @@ public class EnemyAttackTp : EnemyAttackSOBase
             enemy.agentMover.canMove = false;
         }
 
-        currentState = TpState.Teleporting;
-        stateTimer = 0f;
+        BeginTpBegin();
+    }
+
+    public override void DoExitLogic()
+    {
+        base.DoExitLogic();
+        SetAnimBools(false, false);
     }
 
     public override void DoFrameUpdateLogic()
@@ -56,48 +80,119 @@ public class EnemyAttackTp : EnemyAttackSOBase
 
         switch (currentState)
         {
-            case TpState.Teleporting:
-                TeleportToRandomPosition();
-                currentState = TpState.Charging;
-                stateTimer = 0f;
+            case TpState.TpBegin:
+                UpdateTpBeginFallback();
                 break;
-
+            case TpState.TpAppear:
+                UpdateTpAppearFallback();
+                break;
             case TpState.Charging:
                 stateTimer += Time.deltaTime;
                 if (stateTimer >= chargeTime)
-                {
                     currentState = TpState.Shooting;
-                }
                 break;
-
             case TpState.Shooting:
                 ShootAtPlayer();
                 currentState = TpState.Cooldown;
                 stateTimer = 0f;
                 break;
-
             case TpState.Cooldown:
                 stateTimer += Time.deltaTime;
                 if (stateTimer >= teleportCooldown)
-                {
-                    currentState = TpState.Teleporting;
-                }
+                    BeginTpBegin();
                 break;
         }
     }
 
-    private void TeleportToRandomPosition()
+    // ── TpBegin ─────────────────────────────────────────────────────────
+
+    private void BeginTpBegin()
     {
-        if (gridGenerator == null) return;
+        currentState = TpState.TpBegin;
+        phaseTimer = 0f;
+
+        // Lock destination now so the snap on event-end is deterministic.
+        if (!TryPickTeleportDestination(out pendingDestination))
+            pendingDestination = transform.position;
+
+        SetAnimBools(begin: true, appear: false);
+    }
+
+    private void UpdateTpBeginFallback()
+    {
+        if (tpBeginFallbackTimeout <= 0f) return;
+        phaseTimer += Time.deltaTime;
+        if (phaseTimer >= tpBeginFallbackTimeout)
+        {
+            Debug.LogWarning($"[Sorcerer] TpBegin animation event timed out after {tpBeginFallbackTimeout}s — recovering. " +
+                             "Wire OnTpBeginAnimationEnd onto the begin clip's last frame.", enemy);
+            OnTpBeginAnimationEnd();
+        }
+    }
+
+    // Animation event hook — fired at the last frame of the begin-tp clip.
+    public void OnTpBeginAnimationEnd()
+    {
+        if (currentState != TpState.TpBegin) return;
+
+        if (teleportVfxPrefab != null)
+            Object.Instantiate(teleportVfxPrefab, transform.position, Quaternion.identity);
+
+        if (enemyRb != null)
+            enemyRb.position = pendingDestination;
+        else
+            transform.position = pendingDestination;
+
+        if (teleportVfxPrefab != null)
+            Object.Instantiate(teleportVfxPrefab, transform.position, Quaternion.identity);
+
+        BeginTpAppear();
+    }
+
+    // ── TpAppear ────────────────────────────────────────────────────────
+
+    private void BeginTpAppear()
+    {
+        currentState = TpState.TpAppear;
+        phaseTimer = 0f;
+        SetAnimBools(begin: false, appear: true);
+    }
+
+    private void UpdateTpAppearFallback()
+    {
+        if (tpAppearFallbackTimeout <= 0f) return;
+        phaseTimer += Time.deltaTime;
+        if (phaseTimer >= tpAppearFallbackTimeout)
+        {
+            Debug.LogWarning($"[Sorcerer] TpAppear animation event timed out after {tpAppearFallbackTimeout}s — recovering. " +
+                             "Wire OnTpAppearAnimationEnd onto the appear clip's last frame.", enemy);
+            OnTpAppearAnimationEnd();
+        }
+    }
+
+    // Animation event hook — fired at the last frame of the appear clip.
+    public void OnTpAppearAnimationEnd()
+    {
+        if (currentState != TpState.TpAppear) return;
+        SetAnimBools(begin: false, appear: false);
+        currentState = TpState.Charging;
+        stateTimer = 0f;
+    }
+
+    // ── Helpers ─────────────────────────────────────────────────────────
+
+    private bool TryPickTeleportDestination(out Vector3 dest)
+    {
+        dest = transform.position;
+        if (gridGenerator == null) return false;
 
         if (cachedValidNodes == null || cachedValidNodes.Count == 0)
         {
             CacheValidNodes();
-            if (cachedValidNodes.Count == 0) return;
+            if (cachedValidNodes.Count == 0) return false;
         }
 
         float minDistSqr = minDistanceFromPlayer * minDistanceFromPlayer;
-        Node pick = null;
 
         for (int attempt = 0; attempt < 20; attempt++)
         {
@@ -112,22 +207,11 @@ public class EnemyAttackTp : EnemyAttackSOBase
 
             if (Vector2.Distance(pos, transform.position) < 0.05f) continue;
 
-            pick = candidate;
-            break;
+            dest = pos;
+            return true;
         }
 
-        if (pick == null) return;
-
-        if (teleportVfxPrefab != null)
-            Object.Instantiate(teleportVfxPrefab, transform.position, Quaternion.identity);
-
-        if (enemyRb != null)
-            enemyRb.position = pick.transform.position;
-        else
-            transform.position = pick.transform.position;
-
-        if (teleportVfxPrefab != null)
-            Object.Instantiate(teleportVfxPrefab, transform.position, Quaternion.identity);
+        return false;
     }
 
     private void ShootAtPlayer()
@@ -161,11 +245,19 @@ public class EnemyAttackTp : EnemyAttackSOBase
         }
     }
 
+    private void SetAnimBools(bool begin, bool appear)
+    {
+        if (enemy.animator == null) return;
+        if (!string.IsNullOrEmpty(tpBeginBoolName))  enemy.animator.SetBool(tpBeginBoolName,  begin);
+        if (!string.IsNullOrEmpty(tpAppearBoolName)) enemy.animator.SetBool(tpAppearBoolName, appear);
+    }
+
     public override void ResetValues()
     {
         base.ResetValues();
-        currentState = TpState.Teleporting;
+        currentState = TpState.TpBegin;
         stateTimer = 0f;
+        phaseTimer = 0f;
         cachedValidNodes = null;
     }
 }

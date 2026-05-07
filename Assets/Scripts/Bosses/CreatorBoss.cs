@@ -50,6 +50,9 @@ public class CreatorBoss : BossBase
         SetAllPhaseRoots(false);
         onCreatorDefeated?.Invoke();
 
+        if (GameManager.Instance != null)
+            GameManager.Instance.GameOver();
+
         // Keep object for death animation/VFX hooks. Disable after effects if desired.
         gameObject.SetActive(false);
     }
